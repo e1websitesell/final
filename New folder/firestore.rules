@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == "admin";
+    }
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() ||
+        (isSignedIn() &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(["avgRating", "reviewCount"]) &&
+         request.resource.data.avgRating is number &&
+         request.resource.data.avgRating >= 0 && request.resource.data.avgRating <= 5 &&
+         request.resource.data.reviewCount is int &&
+         request.resource.data.reviewCount >= 0);
+
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      }
+    }
+
+    match /{path=**}/reviews/{reviewId} {
+      allow read: if true;
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /coupons/{couponCode} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+      match /cart/{cartItemId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    match /admins/{uid} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    match /orders/{orderId} {
+      allow create: if request.resource.data.status == "pending"
+                    && request.resource.data.items is list
+                    && request.resource.data.totalAmount is number
+                    && request.resource.data.customerPhone is string
+                    && request.resource.data.customerPhone.size() > 0
+                    && request.resource.data.division is string
+                    && request.resource.data.division.size() > 0
+                    && request.resource.data.district is string
+                    && request.resource.data.district.size() > 0
+                    && request.resource.data.addressDetails is string
+                    && request.resource.data.addressDetails.size() > 0
+                    && (!("customerUid" in request.resource.data) ||
+                        (isSignedIn() && request.resource.data.customerUid == request.auth.uid));
+      allow read: if isAdmin() ||
+                    (isSignedIn() && resource.data.customerUid == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+  }
+}
