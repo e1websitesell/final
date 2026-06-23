@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact</title>
+<style>
+  :root {
+    --primary-color: #1a1d29; --accent-color: #6b7280; --site-font: system-ui, sans-serif;
+    --btn-radius: 8px; --ink: #1a1d29; --ink-soft: #6b7280; --line: #e5e7eb; --bg: #f7f7f9;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--site-font); color: var(--ink); background: #fff; }
+  a { text-decoration: none; color: inherit; }
+  .site-header { border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 10; }
+  .header-inner { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; }
+  .brand img { height: 34px; width: auto; }
+  .main-nav { display: flex; align-items: center; gap: 26px; font-size: 14.5px; font-weight: 500; }
+  .cart-link { position: relative; }
+  .cart-badge { position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+  .lang-toggle { border: 1px solid var(--line); background: #fff; padding: 7px 14px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit; }
+  .page-inner { max-width: 560px; margin: 0 auto; padding: 50px 20px 70px; text-align: center; }
+  .page-inner h1 { font-size: 26px; margin-bottom: 12px; font-weight: 700; }
+  .page-inner p.lead { color: var(--ink-soft); margin-bottom: 32px; font-size: 15px; }
+  .contact-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 15px; border-radius: var(--btn-radius); font-size: 15px; font-weight: 600;
+    margin-bottom: 14px; border: 1px solid var(--line);
+  }
+  .contact-btn.whatsapp { background: #16a34a; color: #fff; border-color: #16a34a; }
+  .contact-btn.facebook { background: #1877f2; color: #fff; border-color: #1877f2; }
+  .no-contact { color: var(--ink-soft); font-size: 14px; }
+  .site-footer { border-top: 1px solid var(--line); padding: 28px 20px; margin-top: 40px; }
+  .footer-inner { max-width: 1140px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13.5px; color: var(--ink-soft); }
+  .footer-links { display: flex; gap: 18px; }
+</style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <img id="logoImg" src="" alt="" style="display:none;">
+        <span id="shopNameText"></span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html" data-i18n="home">হোম</a>
+        <a href="shop.html" data-i18n="shop">শপ</a>
+        <a href="cart.html" class="cart-link">
+          <span data-i18n="cart">কার্ট</span>
+          <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
+        </a>
+        <a href="login.html" data-i18n="login">লগইন</a>
+      </nav>
+      <button id="langToggle" class="lang-toggle">English</button>
+    </div>
+  </header>
+
+  <main class="page-inner">
+    <div class="lang-bn">
+      <h1>যোগাযোগ করুন</h1>
+      <p class="lead">কোনো প্রশ্ন বা অর্ডার সংক্রান্ত সাহায্য লাগলে নিচের যেকোনো মাধ্যমে যোগাযোগ করতে পারেন।</p>
+    </div>
+    <div class="lang-en">
+      <h1>Contact Us</h1>
+      <p class="lead">Have a question or need help with an order? Reach us through any of the options below.</p>
+    </div>
+
+    <div id="contactButtons"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span><span id="footerShopName"></span> © <span id="footerYear"></span></span>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { loadThemeAndSettings } from "./assets/js/theme-loader.js";
+    import { getLang, setLang, applyTranslations } from "./assets/js/translations.js";
+    import { updateCartBadge } from "./assets/js/cart.js";
+
+    document.getElementById("langToggle").addEventListener("click", () => {
+      setLang(getLang() === "bn" ? "en" : "bn");
+      location.reload();
+    });
+
+    async function init() {
+      applyTranslations();
+      updateCartBadge();
+      const lang = getLang();
+      document.getElementById("langToggle").textContent = lang === "bn" ? "English" : "বাংলা";
+      document.querySelectorAll(".lang-bn").forEach((el) => el.style.display = lang === "bn" ? "block" : "none");
+      document.querySelectorAll(".lang-en").forEach((el) => el.style.display = lang === "en" ? "block" : "none");
+
+      const btnWrap = document.getElementById("contactButtons");
+
+      try {
+        const settings = await loadThemeAndSettings();
+        const shopName = lang === "bn" ? (settings.shopName_bn || settings.shopName_en) : (settings.shopName_en || settings.shopName_bn);
+        document.title = "Contact — " + (shopName || "Shop");
+        document.getElementById("shopNameText").textContent = shopName || "Shop";
+        document.getElementById("footerShopName").textContent = shopName || "Shop";
+        if (settings.logoUrl) {
+          const logoImg = document.getElementById("logoImg");
+          logoImg.src = settings.logoUrl;
+          logoImg.style.display = "inline-block";
+        }
+
+        let buttonsHtml = "";
+        if (settings.whatsappNumber) {
+          const waUrl = "https://wa.me/" + settings.whatsappNumber.replace(/[^0-9]/g, "");
+          buttonsHtml += `<a href="${waUrl}" target="_blank" class="contact-btn whatsapp">WhatsApp — ${settings.whatsappNumber}</a>`;
+        }
+        if (settings.facebookPageLink) {
+          buttonsHtml += `<a href="${settings.facebookPageLink}" target="_blank" class="contact-btn facebook">Facebook Page</a>`;
+        }
+        btnWrap.innerHTML = buttonsHtml || `<p class="no-contact">${lang === "bn" ? "যোগাযোগের তথ্য এখনো যুক্ত করা হয়নি।" : "Contact information not added yet."}</p>`;
+      } catch (e) {
+        console.error("যোগাযোগের তথ্য লোড করতে সমস্যা হয়েছে:", e);
+        btnWrap.innerHTML = `<p class="no-contact">${lang === "bn" ? "তথ্য লোড করতে সমস্যা হয়েছে।" : "Failed to load contact info."}</p>`;
+      }
+      document.getElementById("footerYear").textContent = new Date().getFullYear();
+    }
+    init();
+  </script>
+
+</body>
+</html>

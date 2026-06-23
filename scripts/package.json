@@ -1,0 +1,9 @@
+{
+  "name": "build-scripts",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "firebase": "^10.12.2",
+    "cheerio": "^1.0.0"
+  }
+}

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart</title>
+<style>
+  :root {
+    --primary-color: #1a1d29;
+    --accent-color: #6b7280;
+    --site-font: system-ui, sans-serif;
+    --btn-radius: 8px;
+    --ink: #1a1d29;
+    --ink-soft: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f7f7f9;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--site-font); color: var(--ink); background: #fff; }
+  a { text-decoration: none; color: inherit; }
+  .muted { color: var(--ink-soft); font-size: 14px; }
+
+  .site-header { border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 10; }
+  .header-inner { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; }
+  .brand img { height: 34px; width: auto; }
+  .main-nav { display: flex; align-items: center; gap: 26px; font-size: 14.5px; font-weight: 500; }
+  .cart-link { position: relative; }
+  .cart-badge { position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+  .lang-toggle { border: 1px solid var(--line); background: #fff; padding: 7px 14px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit; }
+
+  .page-inner { max-width: 800px; margin: 0 auto; padding: 32px 20px 70px; }
+  .page-title { font-size: 24px; font-weight: 700; margin: 0 0 24px; }
+
+  .cart-item { display: grid; grid-template-columns: 64px 1fr auto auto 24px; gap: 14px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .cart-item-img { width: 64px; height: 64px; border-radius: 8px; background-size: cover; background-position: center; background-color: var(--bg); }
+  .cart-item-name { font-size: 14.5px; font-weight: 600; }
+  .cart-item-price { font-size: 13px; color: var(--ink-soft); }
+  .cart-item-qty { display: flex; align-items: center; gap: 10px; }
+  .qty-btn { width: 28px; height: 28px; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; font-size: 15px; font-family: inherit; }
+  .cart-item-total { font-weight: 700; font-size: 14.5px; }
+  .remove-btn { border: none; background: none; color: #b91c1c; cursor: pointer; font-size: 16px; }
+
+  .coupon-row { display: flex; gap: 10px; margin: 24px 0 8px; }
+  .coupon-row input { flex: 1; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--btn-radius); font-size: 14px; font-family: inherit; }
+  .coupon-row button { border: 1px solid var(--primary-color); background: #fff; color: var(--primary-color); padding: 10px 18px; border-radius: var(--btn-radius); font-size: 14px; cursor: pointer; font-family: inherit; }
+  .coupon-status { font-size: 13px; margin-bottom: 20px; min-height: 16px; }
+  .coupon-status.success { color: #15803d; }
+  .coupon-status.error { color: #b91c1c; }
+
+  .summary-box { background: var(--bg); border-radius: 12px; padding: 18px 20px; margin-bottom: 34px; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; }
+  .summary-row.total { font-weight: 700; font-size: 17px; border-top: 1px solid var(--line); margin-top: 8px; padding-top: 12px; }
+
+  #checkoutSection h2 { font-size: 18px; margin-bottom: 18px; }
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .field { flex: 1; min-width: 200px; }
+  .field label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+  .field input, .field select, .field textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--btn-radius); font-size: 14.5px; font-family: inherit; color: var(--ink); }
+
+  .place-order-btn { width: 100%; background: var(--primary-color); color: #fff; border: none; padding: 15px; border-radius: var(--btn-radius); font-size: 15.5px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 10px; }
+  .place-order-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .order-success { text-align: center; padding: 60px 20px; }
+  .order-success h2 { font-size: 24px; color: #15803d; }
+  .cta-link { display: inline-block; margin-top: 16px; background: var(--primary-color); color: #fff; padding: 12px 26px; border-radius: var(--btn-radius); font-weight: 600; }
+
+  .site-footer { border-top: 1px solid var(--line); padding: 28px 20px; margin-top: 40px; }
+  .footer-inner { max-width: 1140px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13.5px; color: var(--ink-soft); }
+  .footer-links { display: flex; gap: 18px; }
+</style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <img id="logoImg" src="" alt="" style="display:none;">
+        <span id="shopNameText"></span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html" data-i18n="home">হোম</a>
+        <a href="shop.html" data-i18n="shop">শপ</a>
+        <a href="cart.html" class="cart-link">
+          <span data-i18n="cart">কার্ট</span>
+          <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
+        </a>
+        <a href="login.html" data-i18n="login">লগইন</a>
+      </nav>
+      <button id="langToggle" class="lang-toggle">English</button>
+    </div>
+  </header>
+
+  <main class="page-inner">
+    <h1 class="page-title">কার্ট</h1>
+
+    <p class="muted" id="cartEmpty" style="display:none;">আপনার কার্ট খালি — <a href="shop.html">শপিং শুরু করুন</a>।</p>
+
+    <div id="cartListSection">
+      <div id="cartItems"></div>
+    </div>
+
+    <div id="summarySection" style="display:none;">
+      <div class="coupon-row">
+        <input type="text" id="couponInput" placeholder="কুপন কোড">
+        <button type="button" id="applyCouponBtn">প্রয়োগ করুন</button>
+      </div>
+      <div class="coupon-status" id="couponStatus"></div>
+
+      <div class="summary-box">
+        <div class="summary-row"><span>সাবটোটাল</span><span id="subtotalVal">৳0</span></div>
+        <div class="summary-row" id="discountRow" style="display:none;"><span>ডিসকাউন্ট</span><span id="discountVal">−৳0</span></div>
+        <div class="summary-row"><span>ডেলিভারি চার্জ</span><span id="deliveryVal">বিভাগ বাছুন</span></div>
+        <div class="summary-row total"><span>মোট</span><span id="totalVal">৳0</span></div>
+      </div>
+
+      <div id="checkoutSection">
+        <h2>ডেলিভারি ইনফো</h2>
+        <form id="checkoutForm">
+          <div class="form-row">
+            <div class="field"><label for="customerName">নাম *</label><input type="text" id="customerName" required></div>
+            <div class="field"><label for="customerPhone">ফোন নাম্বার *</label><input type="text" id="customerPhone" required placeholder="01XXXXXXXXX"></div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="divisionSelect">বিভাগ *</label>
+              <select id="divisionSelect" required></select>
+            </div>
+            <div class="field">
+              <label for="districtSelect">জেলা *</label>
+              <select id="districtSelect" required disabled>
+                <option value="">আগে বিভাগ বাছুন</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:16px;">
+            <label for="addressDetails">সম্পূর্ণ ঠিকানা / এক্সট্রা ডিটেইলস *</label>
+            <textarea id="addressDetails" rows="3" required></textarea>
+          </div>
+          <button type="submit" id="placeOrderBtn" class="place-order-btn">অর্ডার করুন </button>
+        </form>
+      </div>
+    </div>
+
+    <div id="orderSuccess" style="display:none;" class="order-success">
+      <h2>✓ অর্ডার সফল হয়েছে!</h2>
+      <p class="muted">আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব। ধন্যবাদ।</p>
+      <a href="shop.html" class="cta-link">আরও শপিং করুন</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span><span id="footerShopName"></span> © <span id="footerYear"></span></span>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { db, auth } from "./assets/js/firebase-config.js";
+    import { loadThemeAndSettings } from "./assets/js/theme-loader.js";
+    import { getLang, setLang, applyTranslations } from "./assets/js/translations.js";
+    import { getCart, saveCart, updateCartBadge } from "./assets/js/cart.js";
+    import { DIVISIONS, DIVISION_NAMES } from "./assets/js/bd-locations.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, addDoc, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    function escapeAttr(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;");
+    }
+
+    document.getElementById("langToggle").addEventListener("click", () => {
+      setLang(getLang() === "bn" ? "en" : "bn");
+      location.reload();
+    });
+
+    let cart = [];
+    let settings = {};
+    let appliedCoupon = null;
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => { currentUser = user; });
+
+    function getDeliveryCharge(division) {
+      const zones = settings.deliveryZones || [];
+      const match = zones.find((z) => z.division === division);
+      if (match) return match.charge;
+      const fallback = zones.find((z) => z.division === "default");
+      return fallback ? fallback.charge : 0;
+    }
+
+    function updateSummary() {
+      const subtotal = cart.reduce((s, item) => s + item.price * item.qty, 0);
+      let discount = 0;
+      if (appliedCoupon) {
+        discount = appliedCoupon.discountType === "fixed"
+          ? appliedCoupon.discountValue
+          : Math.round(subtotal * appliedCoupon.discountValue / 100);
+        discount = Math.min(discount, subtotal);
+      }
+      const division = document.getElementById("divisionSelect").value;
+      const deliveryCharge = division ? getDeliveryCharge(division) : 0;
+      const total = subtotal - discount + deliveryCharge;
+
+      document.getElementById("subtotalVal").textContent = "৳" + subtotal;
+      document.getElementById("discountRow").style.display = discount > 0 ? "flex" : "none";
+      document.getElementById("discountVal").textContent = "−৳" + discount;
+      document.getElementById("deliveryVal").textContent = division ? "৳" + deliveryCharge : "বিভাগ বাছুন";
+      document.getElementById("totalVal").textContent = "৳" + total;
+    }
+
+    function renderCart() {
+      cart = getCart();
+      const wrap = document.getElementById("cartItems");
+      const emptyState = document.getElementById("cartEmpty");
+      const summarySection = document.getElementById("summarySection");
+
+      if (cart.length === 0) {
+        wrap.innerHTML = "";
+        emptyState.style.display = "block";
+        summarySection.style.display = "none";
+        return;
+      }
+      emptyState.style.display = "none";
+      summarySection.style.display = "block";
+
+      wrap.innerHTML = cart.map((item, i) =>
+        "<div class='cart-item'>" +
+          "<div class='cart-item-img' style=\"background-image:url('" + escapeAttr(item.image || "") + "');\"></div>" +
+          "<div class='cart-item-info'>" +
+            "<div class='cart-item-name'>" + escapeAttr(item.name) + (item.variantName ? " — " + escapeAttr(item.variantName) : "") + "</div>" +
+            "<div class='cart-item-price'>৳" + item.price + "</div>" +
+          "</div>" +
+          "<div class='cart-item-qty'>" +
+            "<button type='button' class='qty-btn' data-i='" + i + "' data-action='dec'>−</button>" +
+            "<span>" + item.qty + "</span>" +
+            "<button type='button' class='qty-btn' data-i='" + i + "' data-action='inc'>+</button>" +
+          "</div>" +
+          "<div class='cart-item-total'>৳" + (item.price * item.qty) + "</div>" +
+          "<button type='button' class='remove-btn' data-i='" + i + "'>✕</button>" +
+        "</div>"
+      ).join("");
+
+      wrap.querySelectorAll(".qty-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.dataset.i);
+          if (btn.dataset.action === "inc") cart[i].qty += 1;
+          else cart[i].qty = Math.max(1, cart[i].qty - 1);
+          saveCart(cart);
+          updateCartBadge();
+          renderCart();
+        });
+      });
+      wrap.querySelectorAll(".remove-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          cart.splice(Number(btn.dataset.i), 1);
+          saveCart(cart);
+          updateCartBadge();
+          renderCart();
+        });
+      });
+
+      updateSummary();
+    }
+
+    document.getElementById("applyCouponBtn").addEventListener("click", async () => {
+      const code = document.getElementById("couponInput").value.trim().toUpperCase();
+      const statusEl = document.getElementById("couponStatus");
+      if (!code) return;
+
+      try {
+        const snap = await getDoc(doc(db, "coupons", code));
+        if (!snap.exists() || !snap.data().active) {
+          statusEl.textContent = "এই কোড পাওয়া যায়নি বা বন্ধ আছে।";
+          statusEl.className = "coupon-status error";
+          appliedCoupon = null;
+          updateSummary();
+          return;
+        }
+        const c = snap.data();
+        if (c.expiryDate && c.expiryDate.toDate && c.expiryDate.toDate() < new Date()) {
+          statusEl.textContent = "কুপনের মেয়াদ শেষ।";
+          statusEl.className = "coupon-status error";
+          appliedCoupon = null;
+          updateSummary();
+          return;
+        }
+        if (c.usageLimit && (c.usageCount || 0) >= c.usageLimit) {
+          statusEl.textContent = "কুপনের ব্যবহার সীমা শেষ।";
+          statusEl.className = "coupon-status error";
+          appliedCoupon = null;
+          updateSummary();
+          return;
+        }
+        const subtotal = cart.reduce((s, item) => s + item.price * item.qty, 0);
+        if (c.minOrderAmount && subtotal < c.minOrderAmount) {
+          statusEl.textContent = "মিনিমাম অর্ডার ৳" + c.minOrderAmount;
+          statusEl.className = "coupon-status error";
+          appliedCoupon = null;
+          updateSummary();
+          return;
+        }
+
+        appliedCoupon = { code, ...c };
+        statusEl.textContent = "কুপন প্রয়োগ হয়েছে ✓";
+        statusEl.className = "coupon-status success";
+        updateSummary();
+      } catch (e) {
+        statusEl.textContent = "কুপন চেক করতে সমস্যা হয়েছে।";
+        statusEl.className = "coupon-status error";
+      }
+    });
+
+    function renderDivisionOptions() {
+      const sel = document.getElementById("divisionSelect");
+      sel.innerHTML = `<option value="">বিভাগ বাছুন</option>` +
+        DIVISION_NAMES.map((d) => `<option value="${d}">${d}</option>`).join("");
+    }
+
+    document.getElementById("divisionSelect").addEventListener("change", (e) => {
+      const division = e.target.value;
+      const districtSel = document.getElementById("districtSelect");
+      if (!division) {
+        districtSel.innerHTML = `<option value="">আগে বিভাগ বাছুন</option>`;
+        districtSel.disabled = true;
+      } else {
+        districtSel.disabled = false;
+        districtSel.innerHTML = `<option value="">জেলা বাছুন</option>` +
+          DIVISIONS[division].map((d) => `<option value="${d}">${d}</option>`).join("");
+      }
+      updateSummary();
+    });
+
+    document.getElementById("checkoutForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const customerName = document.getElementById("customerName").value.trim();
+      const customerPhone = document.getElementById("customerPhone").value.trim();
+      const division = document.getElementById("divisionSelect").value;
+      const district = document.getElementById("districtSelect").value;
+      const addressDetails = document.getElementById("addressDetails").value.trim();
+
+      if (!customerName || !customerPhone || !division || !district || !addressDetails) {
+        alert("সব ফিল্ড পূরণ করা বাধ্যতামূলক।");
+        return;
+      }
+      const phoneRegex = /^01[3-9][0-9]{8}$/;
+      if (!phoneRegex.test(customerPhone)) {
+        alert("সঠিক ফোন নাম্বার দিন (যেমন: 01712345678)");
+        return;
+      }
+      if (cart.length === 0) return;
+
+      const subtotal = cart.reduce((s, item) => s + item.price * item.qty, 0);
+      let discount = 0;
+      if (appliedCoupon) {
+        discount = appliedCoupon.discountType === "fixed"
+          ? appliedCoupon.discountValue
+          : Math.round(subtotal * appliedCoupon.discountValue / 100);
+        discount = Math.min(discount, subtotal);
+      }
+      const deliveryCharge = getDeliveryCharge(division);
+      const totalAmount = subtotal - discount + deliveryCharge;
+
+      const orderData = {
+        items: cart.map((item) => ({
+          productId: item.productId,
+          productName: item.name,
+          variantCode: item.variantCode,
+          variantName: item.variantName || "",
+          qty: item.qty,
+          price: item.price
+        })),
+        totalAmount,
+        couponCode: appliedCoupon ? appliedCoupon.code : null,
+        deliveryCharge,
+        status: "pending",
+        customerName,
+        customerPhone,
+        division,
+        district,
+        addressDetails,
+        createdAt: serverTimestamp()
+      };
+      if (currentUser) orderData.customerUid = currentUser.uid;
+
+      const submitBtn = document.getElementById("placeOrderBtn");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "অর্ডার হচ্ছে...";
+
+      try {
+        await addDoc(collection(db, "orders"), orderData);
+
+        if (settings.whatsappNumber) {
+          const itemsText = cart.map((item) =>
+            (item.variantName ? item.name + " (" + item.variantName + ")" : item.name) + " x" + item.qty
+          ).join(", ");
+          const msg = "Order: " + itemsText + " | Total: ৳" + totalAmount +
+            " | " + customerName + ", " + customerPhone + ", " + district + ", " + division +
+            " | " + addressDetails;
+          const waUrl = "https://wa.me/" + settings.whatsappNumber.replace(/[^0-9]/g, "") + "?text=" + encodeURIComponent(msg);
+          window.open(waUrl, "_blank");
+        }
+
+        saveCart([]);
+        updateCartBadge();
+        document.getElementById("summarySection").style.display = "none";
+        document.getElementById("cartListSection").style.display = "none";
+        document.getElementById("orderSuccess").style.display = "block";
+      } catch (err) {
+        alert("অর্ডার করতে সমস্যা হয়েছে।");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "অর্ডার করুন ";
+      }
+    });
+
+    async function init() {
+      applyTranslations();
+      updateCartBadge();
+      document.getElementById("langToggle").textContent = getLang() === "bn" ? "English" : "বাংলা";
+
+      settings = await loadThemeAndSettings();
+      const lang = getLang();
+      const shopName = lang === "bn" ? (settings.shopName_bn || settings.shopName_en) : (settings.shopName_en || settings.shopName_bn);
+      document.getElementById("shopNameText").textContent = shopName || "Shop";
+      document.getElementById("footerShopName").textContent = shopName || "Shop";
+      document.getElementById("footerYear").textContent = new Date().getFullYear();
+      if (settings.logoUrl) {
+        const logoImg = document.getElementById("logoImg");
+        logoImg.src = settings.logoUrl;
+        logoImg.style.display = "inline-block";
+      }
+
+      renderDivisionOptions();
+      renderCart();
+    }
+
+    init();
+  </script>
+
+</body>
+</html>

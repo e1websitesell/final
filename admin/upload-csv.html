@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>CSV আপলোড — Shop Admin</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root {
+    --ink: #1a1d29;
+    --ink-soft: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f7f7f9;
+    --accent: #3730a3;
+    --accent-soft: #eef2ff;
+    --sidebar: #1a1d29;
+    --ok: #15803d;
+    --ok-bg: #f0fdf4;
+    --err: #b91c1c;
+    --err-bg: #fef2f2;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--ink); background: var(--bg); }
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar { width: 220px; flex-shrink: 0; background: var(--sidebar); color: #fff; padding: 24px 16px; display: flex; flex-direction: column; }
+  .sidebar .logo { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #9ca3af; padding: 0 10px 20px; }
+  .sidebar nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .sidebar nav a { color: #d1d5db; text-decoration: none; padding: 10px 12px; border-radius: 8px; font-size: 14.5px; }
+  .sidebar nav a:hover { background: rgba(255,255,255,0.06); }
+  .sidebar nav a.active { background: var(--accent); color: #fff; font-weight: 600; }
+  .logout-btn { background: transparent; border: 1px solid #374151; color: #d1d5db; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 14px; font-family: inherit; }
+  .logout-btn:hover { background: rgba(255,255,255,0.06); }
+
+  .content { flex: 1; padding: 32px 36px; max-width: 1100px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .topbar h1 { font-size: 22px; margin: 0; font-weight: 600; }
+  .user-email { font-size: 13.5px; color: var(--ink-soft); }
+
+  .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+  .card h2 { margin: 0 0 14px; font-size: 16px; font-weight: 600; }
+  .card p { margin: 0 0 10px; font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
+  .card code { background: var(--bg); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: var(--ink); }
+  ul.col-list { margin: 0 0 14px; padding-left: 20px; font-size: 14px; color: var(--ink-soft); line-height: 1.8; }
+  ul.col-list b { color: var(--ink); }
+
+  button.primary {
+    background: var(--accent); color: #fff; border: none;
+    padding: 11px 22px; border-radius: 8px; font-size: 14.5px;
+    font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.secondary {
+    background: #fff; color: var(--accent); border: 1px solid var(--accent);
+    padding: 10px 18px; border-radius: 8px; font-size: 14px;
+    cursor: pointer; font-family: inherit;
+  }
+
+  input[type="file"] { font-size: 14px; }
+
+  table.preview-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 16px; }
+  table.preview-table th, table.preview-table td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); }
+  table.preview-table th { color: var(--ink-soft); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  tr.row-error { background: var(--err-bg); }
+  .status-ok { color: var(--ok); font-weight: 600; }
+  .status-error { color: var(--err); font-weight: 600; }
+  .summary-line { font-size: 14px; margin-top: 14px; color: var(--ink-soft); }
+
+  #importResult {
+    display: none; margin-top: 16px; padding: 14px 16px;
+    border-radius: 8px; background: var(--ok-bg); border: 1px solid #bbf7d0;
+    font-size: 14px; line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Shop Admin</div>
+      <nav>
+        <a href="dashboard.html">ড্যাশবোর্ড</a>
+        <a href="products.html">প্রোডাক্ট</a>
+        <a href="upload-csv.html" class="active">CSV আপলোড</a>
+        <a href="categories.html">ক্যাটাগরি</a>
+        <a href="coupons.html">কুপন</a>
+        <a href="reviews.html">রিভিউ</a>
+        <a href="settings.html">সেটিংস</a>
+      </nav>
+      <button class="logout-btn" id="logoutBtn">লগআউট</button>
+    </aside>
+
+    <main class="content">
+      <div class="topbar">
+        <h1>CSV বাল্ক আপলোড</h1>
+        <span class="user-email" id="userEmail"></span>
+      </div>
+
+      <div class="card">
+        <h2>ফরম্যাট</h2>
+        <p>CSV ফাইলের প্রথম লাইনে (হেডার) এই কলামগুলোর নাম ঠিক এভাবে থাকতে হবে:</p>
+        <ul class="col-list">
+          <li><b>name_bn, name_en</b> — বাধ্যতামূলক</li>
+          <li><b>basePrice</b> — বাধ্যতামূলক, শুধু সংখ্যা</li>
+          <li><b>category</b> — বাধ্যতামূলক, "ক্যাটাগরি" পেজে আগে বানানো স্লাগ হতে হবে</li>
+          <li>description_bn, description_en — অপশনাল</li>
+          <li>discountPrice — অপশনাল, সংখ্যা</li>
+          <li>tags — অপশনাল, একাধিক হলে <code>;</code> দিয়ে আলাদা করুন</li>
+          <li>images — অপশনাল, একাধিক লিংক হলে <code>;</code> দিয়ে আলাদা করুন</li>
+          <li>variants — অপশনাল। ফরম্যাট: <code>নাম:কোড:দাম:স্টক</code>, একাধিক ভ্যারিয়েন্ট <code>|</code> দিয়ে আলাদা করুন। যেমন: <code>50ml:JIRO-001-50:1200:yes|100ml:JIRO-001-100:2000:yes</code></li>
+        </ul>
+        <button class="secondary" id="downloadSampleBtn">নমুনা CSV ডাউনলোড করুন</button>
+      </div>
+
+      <div class="card">
+        <h2>CSV ফাইল আপলোড করুন</h2>
+        <input type="file" id="csvInput" accept=".csv">
+
+        <div id="previewSection" style="display:none;">
+          <div class="summary-line" id="previewSummary"></div>
+          <table class="preview-table">
+            <thead>
+              <tr><th>লাইন</th><th>নাম (বাংলা)</th><th>নাম (English)</th><th>দাম</th><th>ক্যাটাগরি</th><th>স্ট্যাটাস</th></tr>
+            </thead>
+            <tbody id="previewBody"></tbody>
+          </table>
+          <div style="margin-top:18px;">
+            <button class="primary" id="importBtn">ইম্পোর্ট করুন</button>
+          </div>
+          <div id="importResult"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { requireAdmin, adminLogout } from "../assets/js/admin-auth-guard.js";
+    import { db } from "../assets/js/firebase-config.js";
+    import {
+      collection, addDoc, getDocs, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const user = await requireAdmin();
+    document.getElementById("userEmail").textContent = user.email;
+    document.getElementById("logoutBtn").addEventListener("click", adminLogout);
+
+    let validatedRows = [];
+
+    function escapeAttr(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;");
+    }
+
+    // ---------- নমুনা CSV ডাউনলোড ----------
+    document.getElementById("downloadSampleBtn").addEventListener("click", () => {
+      const sample = [
+        {
+          name_bn: "পারফিউম এ", name_en: "Perfume A",
+          description_bn: "একটা সুন্দর পারফিউম", description_en: "A lovely perfume",
+          basePrice: "500", discountPrice: "450",
+          category: "perfume", tags: "মাস্ক;গ্রীষ্মকালীন",
+          images: "https://example.com/img1.jpg;https://example.com/img2.jpg",
+          variants: ""
+        },
+        {
+          name_bn: "পারফিউম বি", name_en: "Perfume B",
+          description_bn: "ভ্যারিয়েন্ট সহ পারফিউম", description_en: "Perfume with variants",
+          basePrice: "600", discountPrice: "",
+          category: "perfume", tags: "বেস্টসেলার",
+          images: "https://example.com/img3.jpg",
+          variants: "50ml:JIRO-002-50:600:yes|100ml:JIRO-002-100:1000:yes"
+        }
+      ];
+      const csv = Papa.unparse(sample);
+      // \uFEFF (BOM) যুক্ত করা হলো যাতে Excel-এ বাংলা টেক্সট ঠিকভাবে দেখায়
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "sample-products.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // ---------- CSV পার্স ----------
+    document.getElementById("csvInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          processRows(results.data);
+        },
+       error: (err) => {
+  console.error("CSV পার্স করতে সমস্যা হয়েছে:", err);
+  alert("CSV ফাইল পড়তে সমস্যা হয়েছে: " + err.message);
+}
+      });
+    });
+
+   async function processRows(rows) {
+  let knownCategories = new Set();
+
+  try {
+    const snap = await getDocs(collection(db, "categories"));
+
+    snap.forEach((d) => {
+      const c = d.data();
+
+      if (c.slug) {
+        knownCategories.add(c.slug);
+      }
+    });
+  } catch (e) {
+    console.error(
+      "ক্যাটাগরি লিস্ট লোড করতে সমস্যা হয়েছে (category-exists চেক স্কিপ হচ্ছে):",
+      e
+    );
+  }
+
+  validatedRows = rows.map((row, index) =>
+    validateRow(row, index, knownCategories)
+  );
+
+  renderPreview();
+}
+
+    function validateRow(row, index, knownCategories) {
+      const errors = [];
+
+      const name_bn = (row.name_bn || "").trim();
+      const name_en = (row.name_en || "").trim();
+      const basePriceRaw = (row.basePrice || "").trim();
+      const category = (row.category || "").trim();
+
+      if (!name_bn) errors.push("name_bn ফাঁকা");
+      if (!name_en) errors.push("name_en ফাঁকা");
+      if (!basePriceRaw || isNaN(Number(basePriceRaw)) || Number(basePriceRaw) <= 0) {
+        errors.push("basePrice ভ্যালিড সংখ্যা না");
+      }
+      if (!category) {
+        errors.push("category ফাঁকা");
+      } else if (knownCategories.size > 0 && !knownCategories.has(category)) {
+        errors.push(`category "${category}" পাওয়া যায়নি`);
+      }
+
+      const discountPriceRaw = (row.discountPrice || "").trim();
+      let discountPrice = null;
+      if (discountPriceRaw) {
+        if (isNaN(Number(discountPriceRaw))) {
+          errors.push("discountPrice ভ্যালিড সংখ্যা না");
+        } else {
+          discountPrice = Number(discountPriceRaw);
+        }
+      }
+
+      const tags = (row.tags || "").trim()
+        ? row.tags.split(";").map((t) => t.trim()).filter(Boolean)
+        : [];
+
+      const images = (row.images || "").trim()
+        ? row.images.split(";").map((u) => u.trim()).filter(Boolean)
+        : [];
+
+      let hasVariants = false;
+      let variants = [];
+      const variantsRaw = (row.variants || "").trim();
+      if (variantsRaw) {
+        hasVariants = true;
+        const parts = variantsRaw.split("|").map((v) => v.trim()).filter(Boolean);
+        for (const part of parts) {
+          const fields = part.split(":").map((f) => f.trim());
+          const variantName = fields[0] || "";
+          const productCode = fields[1] || "";
+          const priceOverrideRaw = fields[2] || "";
+          const inStockRaw = (fields[3] || "").toLowerCase();
+
+          if (!variantName || !productCode) {
+            errors.push(`ভ্যারিয়েন্ট "${part}"-এ নাম বা কোড নেই`);
+            continue;
+          }
+          variants.push({
+            variantName,
+            productCode,
+            priceOverride: priceOverrideRaw && !isNaN(Number(priceOverrideRaw)) ? Number(priceOverrideRaw) : null,
+            inStock: !["no", "false", "0"].includes(inStockRaw)
+          });
+        }
+        if (variants.length === 0) errors.push("variants কলাম ছিল কিন্তু কোনো ভ্যালিড ভ্যারিয়েন্ট পাওয়া যায়নি");
+      }
+
+      return {
+        rowNumber: index + 2, // হেডার রো ধরে CSV ফাইলে আসল লাইন নাম্বার
+        valid: errors.length === 0,
+        errors,
+        data: {
+          name_bn,
+          name_en,
+          description_bn: (row.description_bn || "").trim(),
+          description_en: (row.description_en || "").trim(),
+          basePrice: Number(basePriceRaw) || 0,
+          discountPrice,
+          category,
+          tags,
+          images,
+          hasVariants,
+          variants
+        }
+      };
+    }
+
+    function renderPreview() {
+      const tbody = document.getElementById("previewBody");
+      tbody.innerHTML = validatedRows.map((r) => {
+        const status = r.valid
+          ? `<span class="status-ok">✓ ঠিক আছে</span>`
+          : `<span class="status-error">✗ ${escapeAttr(r.errors.join(", "))}</span>`;
+        return `<tr class="${r.valid ? "" : "row-error"}">
+          <td>${r.rowNumber}</td>
+          <td>${escapeAttr(r.data.name_bn)}</td>
+          <td>${escapeAttr(r.data.name_en)}</td>
+          <td>${r.data.basePrice}</td>
+          <td>${escapeAttr(r.data.category)}</td>
+          <td>${status}</td>
+        </tr>`;
+      }).join("");
+
+      const validCount = validatedRows.filter((r) => r.valid).length;
+      document.getElementById("previewSummary").textContent =
+        `${validatedRows.length} টা রো পাওয়া গেছে, এর মধ্যে ${validCount} টা ইম্পোর্ট করার জন্য ঠিক আছে।`;
+
+      document.getElementById("previewSection").style.display = "block";
+      document.getElementById("importResult").style.display = "none";
+      document.getElementById("importBtn").disabled = validCount === 0;
+    }
+
+    // ---------- ইম্পোর্ট ----------
+    document.getElementById("importBtn").addEventListener("click", async () => {
+      const validRows = validatedRows.filter((r) => r.valid);
+      if (validRows.length === 0) return;
+
+      const importBtn = document.getElementById("importBtn");
+      importBtn.disabled = true;
+      const resultBox = document.getElementById("importResult");
+
+      let successCount = 0;
+      const failures = [];
+
+      for (let i = 0; i < validRows.length; i++) {
+        importBtn.textContent = `ইম্পোর্ট হচ্ছে... (${i + 1}/${validRows.length})`;
+        const r = validRows[i];
+        try {
+          const productData = {
+            ...r.data,
+            avgRating: 0,
+            reviewCount: 0,
+            createdAt: serverTimestamp()
+          };
+          await addDoc(collection(db, "products"), productData);
+          successCount++;
+        } catch (e) {
+
+  console.error(
+    "লাইন " + r.rowNumber + " ইম্পোর্ট করতে সমস্যা হয়েছে:",
+    e
+  );
+
+  failures.push(
+    `লাইন ${r.rowNumber}: ${e.message}`
+  );
+}
+      }
+
+      importBtn.textContent = "ইম্পোর্ট করুন";
+      importBtn.disabled = false;
+
+      resultBox.innerHTML =
+        `<strong>${successCount} টা প্রোডাক্ট সফলভাবে যুক্ত হয়েছে।</strong>` +
+        (failures.length > 0 ? `<br>${failures.length} টা ব্যর্থ হয়েছে:<br>${failures.join("<br>")}` : "");
+      resultBox.style.display = "block";
+
+      document.getElementById("csvInput").value = "";
+      validatedRows = [];
+    });
+  </script>
+
+</body>
+</html>

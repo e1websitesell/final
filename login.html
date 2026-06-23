@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<style>
+  :root {
+    --primary-color: #1a1d29;
+    --accent-color: #6b7280;
+    --site-font: system-ui, sans-serif;
+    --btn-radius: 8px;
+    --ink: #1a1d29;
+    --ink-soft: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f7f7f9;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--site-font); color: var(--ink); background: var(--bg); }
+  a { text-decoration: none; color: inherit; }
+
+  .auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .auth-card { width: 100%; max-width: 380px; background: #fff; border-radius: 14px; padding: 36px 32px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .auth-brand { text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 24px; }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+  .tab-btn { flex: 1; background: none; border: none; padding: 10px; font-size: 14.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; font-family: inherit; }
+  .tab-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+  .field input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--btn-radius); font-size: 14.5px; font-family: inherit; }
+
+  .submit-btn { width: 100%; background: var(--primary-color); color: #fff; border: none; padding: 12px; border-radius: var(--btn-radius); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 4px; }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .back-link { text-align: center; margin-top: 18px; font-size: 13.5px; }
+  .back-link a { color: var(--primary-color); font-weight: 600; }
+</style>
+</head>
+<body>
+
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-brand" id="shopNameText">Shop</div>
+
+      <div class="tabs">
+        <button type="button" class="tab-btn active" id="tabLogin">লগইন</button>
+        <button type="button" class="tab-btn" id="tabSignup">সাইন আপ</button>
+      </div>
+
+      <form id="loginForm">
+        <div class="field"><label for="loginEmail">ইমেইল</label><input type="email" id="loginEmail" required></div>
+        <div class="field"><label for="loginPassword">পাসওয়ার্ড</label><input type="password" id="loginPassword" required></div>
+        <button type="submit" class="submit-btn" id="loginBtn">লগইন</button>
+      </form>
+
+      <form id="signupForm" style="display:none;">
+        <div class="field"><label for="signupName">নাম</label><input type="text" id="signupName" required></div>
+        <div class="field"><label for="signupEmail">ইমেইল</label><input type="email" id="signupEmail" required></div>
+        <div class="field"><label for="signupPhone">ফোন (অপশনাল)</label><input type="text" id="signupPhone"></div>
+        <div class="field"><label for="signupPassword">পাসওয়ার্ড (অন্তত ৬ ক্যারেক্টার)</label><input type="password" id="signupPassword" required></div>
+        <button type="submit" class="submit-btn" id="signupBtn">অ্যাকাউন্ট খুলুন</button>
+      </form>
+
+      <div class="back-link"><a href="index.html">← হোমে ফিরে যান</a></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./assets/js/firebase-config.js";
+    import { loadThemeAndSettings } from "./assets/js/theme-loader.js";
+    import { getLang } from "./assets/js/translations.js";
+    import { getCart, saveCart } from "./assets/js/cart.js";
+    import {
+      createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      doc, setDoc, collection, getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) window.location.href = "account.html";
+    });
+
+    function switchTab(tab) {
+      document.getElementById("loginForm").style.display = tab === "login" ? "block" : "none";
+      document.getElementById("signupForm").style.display = tab === "signup" ? "block" : "none";
+      document.getElementById("tabLogin").classList.toggle("active", tab === "login");
+      document.getElementById("tabSignup").classList.toggle("active", tab === "signup");
+    }
+    document.getElementById("tabLogin").addEventListener("click", () => switchTab("login"));
+    document.getElementById("tabSignup").addEventListener("click", () => switchTab("signup"));
+
+    function getErrorMessage(err) {
+      const code = err.code || "";
+      if (code.includes("email-already-in-use")) return "এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট আছে।";
+      if (code.includes("invalid-email")) return "ইমেইল ফরম্যাট ঠিক নেই।";
+      if (code.includes("wrong-password") || code.includes("invalid-credential")) return "ইমেইল বা পাসওয়ার্ড ভুল।";
+      if (code.includes("user-not-found")) return "এই ইমেইলে কোনো অ্যাকাউন্ট নেই।";
+      if (code.includes("weak-password")) return "পাসওয়ার্ড খুব দুর্বল।";
+      return "একটা সমস্যা হয়েছে, আবার চেষ্টা করুন।";
+    }
+
+    async function mergeCartOnLogin(uid) {
+      try {
+        const snap = await getDocs(collection(db, "users", uid, "cart"));
+        if (snap.empty) return;
+        const localCart = getCart();
+        snap.forEach((docSnap) => {
+          const item = docSnap.data();
+          const existing = localCart.find((i) => i.productId === item.productId && i.variantCode === item.variantCode);
+          if (existing) existing.qty += item.qty || 1;
+          else localCart.push(item);
+        });
+        saveCart(localCart);
+      } catch (e) {
+        // কার্ট মার্জ ফেইল হলেও লগইন সফল ধরে নেওয়া হচ্ছে
+      }
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const btn = document.getElementById("loginBtn");
+      btn.disabled = true;
+      btn.textContent = "লগইন হচ্ছে...";
+      try {
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        await mergeCartOnLogin(cred.user.uid);
+        window.location.href = "account.html";
+      } catch (err) {
+        alert(getErrorMessage(err));
+        btn.disabled = false;
+        btn.textContent = "লগইন";
+      }
+    });
+
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("signupName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const phone = document.getElementById("signupPhone").value.trim();
+      const password = document.getElementById("signupPassword").value;
+
+      if (password.length < 6) {
+        alert("পাসওয়ার্ড অন্তত ৬ ক্যারেক্টার হতে হবে।");
+        return;
+      }
+
+      const btn = document.getElementById("signupBtn");
+      btn.disabled = true;
+      btn.textContent = "অ্যাকাউন্ট বানানো হচ্ছে...";
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: name });
+        await setDoc(doc(db, "users", cred.user.uid), { name, email, phone });
+        await mergeCartOnLogin(cred.user.uid);
+        window.location.href = "account.html";
+      } catch (err) {
+        alert(getErrorMessage(err));
+        btn.disabled = false;
+        btn.textContent = "অ্যাকাউন্ট খুলুন";
+      }
+    });
+
+    async function init() {
+      const settings = await loadThemeAndSettings();
+      const lang = getLang();
+      const shopName = lang === "bn" ? (settings.shopName_bn || settings.shopName_en) : (settings.shopName_en || settings.shopName_bn);
+      document.getElementById("shopNameText").textContent = shopName || "Shop";
+    }
+    init();
+  </script>
+
+</body>
+</html>

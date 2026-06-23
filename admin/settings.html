@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>সেটিংস — Shop Admin</title>
+<style>
+  :root {
+    --ink: #1a1d29;
+    --ink-soft: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f7f7f9;
+    --accent: #3730a3;
+    --accent-soft: #eef2ff;
+    --sidebar: #1a1d29;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--ink); background: var(--bg); }
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar { width: 220px; flex-shrink: 0; background: var(--sidebar); color: #fff; padding: 24px 16px; display: flex; flex-direction: column; }
+  .sidebar .logo { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #9ca3af; padding: 0 10px 20px; }
+  .sidebar nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .sidebar nav a { color: #d1d5db; text-decoration: none; padding: 10px 12px; border-radius: 8px; font-size: 14.5px; }
+  .sidebar nav a:hover { background: rgba(255,255,255,0.06); }
+  .sidebar nav a.active { background: var(--accent); color: #fff; font-weight: 600; }
+  .logout-btn { background: transparent; border: 1px solid #374151; color: #d1d5db; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 14px; font-family: inherit; }
+  .logout-btn:hover { background: rgba(255,255,255,0.06); }
+
+  .content { flex: 1; padding: 32px 36px; max-width: 1100px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .topbar h1 { font-size: 22px; margin: 0; font-weight: 600; }
+  .user-email { font-size: 13.5px; color: var(--ink-soft); }
+
+  .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+  .card h2 { margin: 0 0 18px; font-size: 16px; font-weight: 600; }
+
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .field { flex: 1; min-width: 200px; }
+  .field label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+  .field input, .field select { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 14.5px; font-family: inherit; color: var(--ink); }
+  .field input[type="color"] { padding: 4px; height: 40px; }
+  .hint { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+
+  .field-block { margin-bottom: 20px; }
+  .field-block > label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; }
+  .image-input-row { display: flex; gap: 8px; }
+  .image-input-row input[type="text"] { flex: 1; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 14.5px; font-family: inherit; }
+  .image-previews { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .img-thumb { position: relative; width: 72px; height: 72px; }
+  .img-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+  .img-thumb button { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; border: none; background: #b91c1c; color: #fff; font-size: 11px; cursor: pointer; line-height: 1; }
+
+  .small-btn { border: none; border-radius: 6px; padding: 7px 14px; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .small-btn.add { background: var(--accent-soft); color: var(--accent); }
+  .small-btn.remove { background: #fef2f2; color: #b91c1c; }
+  .small-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .preset-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .preset-btn { display: flex; align-items: center; gap: 8px; border: 2px solid var(--line); background: #fff; border-radius: 10px; padding: 10px 16px; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .preset-btn:hover { border-color: var(--accent); }
+  .preset-swatch { width: 16px; height: 16px; border-radius: 50%; display: inline-block; }
+
+  .theme-preview { display: flex; align-items: center; gap: 12px; margin: 18px 0; padding: 16px; background: var(--bg); border-radius: 10px; }
+  .swatch-box { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); }
+  .preview-btn { border: none; color: #fff; padding: 9px 18px; font-size: 14px; font-family: inherit; cursor: default; }
+
+  .custom-slots { border-top: 1px solid var(--line); padding-top: 16px; }
+  .custom-slot-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
+  .custom-slot-label { font-size: 14.5px; }
+
+  table.zone-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  table.zone-table th, table.zone-table td { padding: 6px 6px; text-align: left; }
+  table.zone-table th { font-size: 12px; color: var(--ink-soft); text-transform: uppercase; }
+  table.zone-table input, table.zone-table select { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; font-family: inherit; }
+
+  .actions-row { display: flex; gap: 14px; align-items: center; }
+  button.primary { background: var(--accent); color: #fff; border: none; padding: 12px 26px; border-radius: 8px; font-size: 14.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Shop Admin</div>
+      <nav>
+        <a href="dashboard.html">ড্যাশবোর্ড</a>
+        <a href="products.html">প্রোডাক্ট</a>
+        <a href="upload-csv.html">CSV আপলোড</a>
+        <a href="categories.html">ক্যাটাগরি</a>
+        <a href="coupons.html">কুপন</a>
+        <a href="reviews.html">রিভিউ</a>
+        <a href="settings.html" class="active">সেটিংস</a>
+      </nav>
+      <button class="logout-btn" id="logoutBtn">লগআউট</button>
+    </aside>
+
+    <main class="content">
+      <div class="topbar">
+        <h1>সেটিংস</h1>
+        <span class="user-email" id="userEmail"></span>
+      </div>
+
+      <div class="card">
+        <h2>শপ ইনফো</h2>
+
+        <div class="form-row">
+          <div class="field"><label for="shopName_bn">শপের নাম (বাংলা) *</label><input type="text" id="shopName_bn"></div>
+          <div class="field"><label for="shopName_en">শপের নাম (English) *</label><input type="text" id="shopName_en"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="field"><label for="heroText_bn">হিরো টেক্সট (বাংলা)</label><input type="text" id="heroText_bn"></div>
+          <div class="field"><label for="heroText_en">হিরো টেক্সট (English)</label><input type="text" id="heroText_en"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="field"><label for="whatsappNumber">WhatsApp নাম্বার</label><input type="text" id="whatsappNumber" placeholder="8801XXXXXXXXX"></div>
+          <div class="field"><label for="facebookPageLink">Facebook পেজ লিংক</label><input type="text" id="facebookPageLink" placeholder="https://facebook.com/..."></div>
+          <div class="field">
+            <label for="defaultLanguage">ডিফল্ট ভাষা</label>
+            <select id="defaultLanguage">
+              <option value="bn">বাংলা</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <label>লোগো</label>
+          <div class="image-input-row">
+            <input type="text" id="logoUrlInput" placeholder="ছবির লিংক পেস্ট করুন">
+            <button type="button" class="small-btn add" id="setLogoBtn">সেট করুন</button>
+          </div>
+          <input type="file" id="logoFileInput" accept="image/*" style="margin-top:10px;">
+          <div class="image-previews" id="logoPreviewWrap"></div>
+        </div>
+
+        <div class="field-block">
+          <label>ব্যানার/কভার ছবি (একাধিক দিলে অটো কারুসেল হবে)</label>
+          <div class="image-input-row">
+            <input type="text" id="bannerUrlInput" placeholder="ছবির লিংক পেস্ট করুন">
+            <button type="button" class="small-btn add" id="addBannerUrlBtn">যুক্ত করুন</button>
+          </div>
+          <input type="file" id="bannerFileInput" accept="image/*" multiple style="margin-top:10px;">
+          <div class="image-previews" id="bannerPreviewWrap"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>থিম</h2>
+
+        <div class="preset-row" id="presetRow"></div>
+
+        <div class="form-row" style="margin-top:20px;">
+          <div class="field"><label for="primaryColor">প্রাইমারি কালার</label><input type="color" id="primaryColor"></div>
+          <div class="field"><label for="accentColor">অ্যাকসেন্ট কালার</label><input type="color" id="accentColor"></div>
+          <div class="field">
+            <label for="fontPair">ফন্ট</label>
+            <select id="fontPair">
+              <option value="minimal">Minimal (system font)</option>
+              <option value="modern-sans">Modern Sans</option>
+              <option value="classic-serif">Classic Serif</option>
+              <option value="bold-display">Bold Display</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="buttonShape">বাটন শেইপ</label>
+            <select id="buttonShape">
+              <option value="rounded">Rounded</option>
+              <option value="sharp">Sharp</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="homepageLayout">হোমপেজ লেআউট</label>
+            <select id="homepageLayout">
+              <option value="grid">Grid</option>
+              <option value="carousel">Carousel</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="theme-preview" id="themePreview"></div>
+
+        <div class="custom-slots" id="customSlots"></div>
+      </div>
+
+      <div class="card">
+        <h2>ডেলিভারি জোন</h2>
+        <table class="zone-table">
+          <thead><tr><th>বিভাগ</th><th>চার্জ (৳)</th><th></th></tr></thead>
+          <tbody id="zonesBody"></tbody>
+        </table>
+        <button type="button" class="small-btn add" id="addZoneBtn">+ জোন যুক্ত করুন</button>
+      </div>
+
+      <div class="actions-row">
+        <button type="button" class="primary" id="saveBtn">সব সেভ করুন</button>
+        <span class="hint" id="saveStatus"></span>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { requireAdmin, adminLogout } from "../assets/js/admin-auth-guard.js";
+    import { db } from "../assets/js/firebase-config.js";
+    import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from "../assets/js/cloudinary-config.js";
+    import { DIVISION_NAMES } from "../assets/js/bd-locations.js";
+    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const user = await requireAdmin();
+    document.getElementById("userEmail").textContent = user.email;
+    document.getElementById("logoutBtn").addEventListener("click", adminLogout);
+
+    function escapeAttr(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;");
+    }
+
+    async function uploadToCloudinary(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+        { method: "POST", body: formData }
+      );
+      if (!res.ok) throw new Error("upload failed");
+      const data = await res.json();
+      return data.secure_url;
+    }
+
+    // ---------- প্রিসেট থিম ----------
+    const PRESETS = {
+      minimal: { label: "Minimal", primaryColor: "#1a1d29", accentColor: "#6b7280", fontPair: "minimal", buttonShape: "sharp", homepageLayout: "grid" },
+      modern: { label: "Modern", primaryColor: "#3730a3", accentColor: "#06b6d4", fontPair: "modern-sans", buttonShape: "rounded", homepageLayout: "grid" },
+      premium: { label: "Premium / Luxury", primaryColor: "#1c1917", accentColor: "#b45309", fontPair: "classic-serif", buttonShape: "sharp", homepageLayout: "carousel" },
+      bold: { label: "Bold / Colorful", primaryColor: "#dc2626", accentColor: "#f59e0b", fontPair: "bold-display", buttonShape: "rounded", homepageLayout: "carousel" }
+    };
+
+    function renderPresetButtons() {
+      const wrap = document.getElementById("presetRow");
+      wrap.innerHTML = Object.entries(PRESETS).map(([key, p]) =>
+        `<button type="button" class="preset-btn" data-key="${key}">
+           <span class="preset-swatch" style="background:${p.primaryColor};"></span>${p.label}
+         </button>`
+      ).join("");
+      wrap.querySelectorAll(".preset-btn").forEach((b) => {
+        b.addEventListener("click", () => applyThemeValues(PRESETS[b.dataset.key]));
+      });
+    }
+
+    function readThemeFields() {
+      return {
+        primaryColor: document.getElementById("primaryColor").value,
+        accentColor: document.getElementById("accentColor").value,
+        fontPair: document.getElementById("fontPair").value,
+        buttonShape: document.getElementById("buttonShape").value,
+        homepageLayout: document.getElementById("homepageLayout").value
+      };
+    }
+
+    function applyThemeValues(v) {
+      document.getElementById("primaryColor").value = v.primaryColor || "#1a1d29";
+      document.getElementById("accentColor").value = v.accentColor || "#6b7280";
+      document.getElementById("fontPair").value = v.fontPair || "minimal";
+      document.getElementById("buttonShape").value = v.buttonShape || "rounded";
+      document.getElementById("homepageLayout").value = v.homepageLayout || "grid";
+      updateThemePreview();
+    }
+
+    function updateThemePreview() {
+      const v = readThemeFields();
+      const radius = v.buttonShape === "sharp" ? "4px" : "20px";
+      document.getElementById("themePreview").innerHTML =
+        `<span class="swatch-box" style="background:${v.primaryColor};"></span>` +
+        `<span class="swatch-box" style="background:${v.accentColor};"></span>` +
+        `<button type="button" class="preview-btn" style="background:${v.primaryColor}; border-radius:${radius};">প্রিভিউ বাটন</button>`;
+    }
+    ["primaryColor", "accentColor", "buttonShape"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", updateThemePreview);
+    });
+
+    // ---------- কাস্টম স্লট ----------
+    let customPresets = { custom1: null, custom2: null };
+
+    function renderCustomSlots() {
+      const wrap = document.getElementById("customSlots");
+      wrap.innerHTML = ["custom1", "custom2"].map((key, i) => {
+        const saved = customPresets[key];
+        const label = "Custom " + (i + 1);
+        return `
+          <div class="custom-slot-row">
+            <div class="custom-slot-label">${label}: <span class="hint">${saved ? "সেভ করা আছে" : "খালি"}</span></div>
+            <div>
+              <button type="button" class="small-btn add" data-slot="${key}" data-action="save">এখানে সেভ করুন</button>
+              <button type="button" class="small-btn add" data-slot="${key}" data-action="load" ${saved ? "" : "disabled"}>লোড করুন</button>
+            </div>
+          </div>`;
+      }).join("");
+
+      wrap.querySelectorAll("button[data-action='save']").forEach((b) => {
+        b.addEventListener("click", () => {
+          customPresets[b.dataset.slot] = readThemeFields();
+          renderCustomSlots();
+          alert("লোকালি সেভ হয়েছে। নিচের 'সব সেভ করুন' বাটনে চাপলে এটা পার্মানেন্ট হবে।");
+        });
+      });
+      wrap.querySelectorAll("button[data-action='load']").forEach((b) => {
+        b.addEventListener("click", () => {
+          if (customPresets[b.dataset.slot]) applyThemeValues(customPresets[b.dataset.slot]);
+        });
+      });
+    }
+
+    // ---------- লোগো ----------
+    let logoUrl = "";
+
+    function renderLogoPreview() {
+      const wrap = document.getElementById("logoPreviewWrap");
+      wrap.innerHTML = logoUrl
+        ? `<div class="img-thumb"><img src="${escapeAttr(logoUrl)}" alt=""><button type="button" id="removeLogoBtn">✕</button></div>`
+        : "";
+      const removeBtn = document.getElementById("removeLogoBtn");
+      if (removeBtn) removeBtn.addEventListener("click", () => { logoUrl = ""; renderLogoPreview(); });
+    }
+
+    document.getElementById("setLogoBtn").addEventListener("click", () => {
+      const input = document.getElementById("logoUrlInput");
+      const url = input.value.trim();
+      if (!url) return;
+      logoUrl = url;
+      input.value = "";
+      renderLogoPreview();
+    });
+
+    document.getElementById("logoFileInput").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        logoUrl = await uploadToCloudinary(file);
+        renderLogoPreview();
+      } catch (err) {
+        alert("লোগো আপলোড করতে সমস্যা হয়েছে।");
+      }
+      e.target.value = "";
+    });
+
+    // ---------- ব্যানার ছবি ----------
+    let bannerImages = [];
+
+    function renderBannerPreviews() {
+      const wrap = document.getElementById("bannerPreviewWrap");
+      wrap.innerHTML = bannerImages.map((url, i) =>
+        `<div class="img-thumb"><img src="${escapeAttr(url)}" alt=""><button type="button" class="banner-remove" data-i="${i}">✕</button></div>`
+      ).join("");
+      wrap.querySelectorAll(".banner-remove").forEach((b) => {
+        b.addEventListener("click", () => { bannerImages.splice(Number(b.dataset.i), 1); renderBannerPreviews(); });
+      });
+    }
+
+    document.getElementById("addBannerUrlBtn").addEventListener("click", () => {
+      const input = document.getElementById("bannerUrlInput");
+      const url = input.value.trim();
+      if (!url) return;
+      bannerImages.push(url);
+      input.value = "";
+      renderBannerPreviews();
+    });
+
+    document.getElementById("bannerFileInput").addEventListener("change", async (e) => {
+      const files = Array.from(e.target.files || []);
+      for (const file of files) {
+        try {
+          bannerImages.push(await uploadToCloudinary(file));
+        } catch (err) {
+          alert("একটা ছবি আপলোড করতে সমস্যা হয়েছে।");
+        }
+      }
+      e.target.value = "";
+      renderBannerPreviews();
+    });
+
+    // ---------- ডেলিভারি জোন ----------
+    let zones = [];
+
+    function renderZonesTable() {
+      const body = document.getElementById("zonesBody");
+      const divisionOptions = `<option value="default">ডিফল্ট (বাকি সব বিভাগ)</option>` +
+        DIVISION_NAMES.map((d) => `<option value="${d}">${d}</option>`).join("");
+
+      body.innerHTML = zones.map((z, i) => `
+        <tr>
+          <td>
+            <select class="zone-division" data-i="${i}">
+              ${divisionOptions}
+            </select>
+          </td>
+          <td><input type="number" class="zone-charge" data-i="${i}" value="${z.charge ?? ""}" min="0"></td>
+          <td><button type="button" class="small-btn remove zone-remove" data-i="${i}">✕</button></td>
+        </tr>
+      `).join("");
+
+      body.querySelectorAll(".zone-division").forEach((el) => {
+        el.value = zones[Number(el.dataset.i)].division || "default";
+        el.addEventListener("change", (e) => {
+          zones[Number(e.target.dataset.i)].division = e.target.value;
+        });
+      });
+      body.querySelectorAll(".zone-charge").forEach((el) => el.addEventListener("input", (e) => {
+        zones[Number(e.target.dataset.i)].charge = Number(e.target.value) || 0;
+      }));
+      body.querySelectorAll(".zone-remove").forEach((el) => el.addEventListener("click", (e) => {
+        zones.splice(Number(e.target.dataset.i), 1);
+        renderZonesTable();
+      }));
+    }
+
+    document.getElementById("addZoneBtn").addEventListener("click", () => {
+      zones.push({ division: "default", charge: 0 });
+      renderZonesTable();
+    });
+
+    // ---------- লোড ----------
+    async function loadSettings() {
+      try {
+        const snap = await getDoc(doc(db, "settings", "site"));
+        if (snap.exists()) {
+          const s = snap.data();
+          document.getElementById("shopName_bn").value = s.shopName_bn || "";
+          document.getElementById("shopName_en").value = s.shopName_en || "";
+          document.getElementById("heroText_bn").value = s.heroText_bn || "";
+          document.getElementById("heroText_en").value = s.heroText_en || "";
+          document.getElementById("whatsappNumber").value = s.whatsappNumber || "";
+          document.getElementById("facebookPageLink").value = s.facebookPageLink || "";
+          document.getElementById("defaultLanguage").value = s.defaultLanguage || "bn";
+
+          logoUrl = s.logoUrl || "";
+          bannerImages = Array.isArray(s.bannerImages) ? [...s.bannerImages] : [];
+          renderLogoPreview();
+          renderBannerPreviews();
+
+          applyThemeValues(s.theme || PRESETS.minimal);
+
+          customPresets = s.customPresets || { custom1: null, custom2: null };
+
+          zones = Array.isArray(s.deliveryZones) ? s.deliveryZones.map((z) => ({ ...z })) : [];
+        } else {
+          applyThemeValues(PRESETS.minimal);
+        }
+        renderCustomSlots();
+        renderZonesTable();
+      } catch (e) {
+        alert("সেটিংস লোড করতে সমস্যা হয়েছে।");
+      }
+    }
+
+    // ---------- সেভ ----------
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+      const shopName_bn = document.getElementById("shopName_bn").value.trim();
+      const shopName_en = document.getElementById("shopName_en").value.trim();
+
+      if (!shopName_bn || !shopName_en) {
+        alert("শপের নাম (বাংলা + ইংরেজি) দেওয়া বাধ্যতামূলক।");
+        return;
+      }
+
+      const saveBtn = document.getElementById("saveBtn");
+      saveBtn.disabled = true;
+      document.getElementById("saveStatus").textContent = "সেভ হচ্ছে...";
+
+      try {
+        const data = {
+          shopName_bn,
+          shopName_en,
+          heroText_bn: document.getElementById("heroText_bn").value.trim(),
+          heroText_en: document.getElementById("heroText_en").value.trim(),
+          whatsappNumber: document.getElementById("whatsappNumber").value.trim(),
+          facebookPageLink: document.getElementById("facebookPageLink").value.trim(),
+          defaultLanguage: document.getElementById("defaultLanguage").value,
+          logoUrl,
+          bannerImages,
+          theme: readThemeFields(),
+          customPresets,
+          deliveryZones: zones
+        };
+        await setDoc(doc(db, "settings", "site"), data);
+        document.getElementById("saveStatus").textContent = "সেভ হয়েছে ✓";
+        setTimeout(() => { document.getElementById("saveStatus").textContent = ""; }, 2500);
+      } catch (e) {
+        alert("সেভ করতে সমস্যা হয়েছে।");
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+
+    // ---------- ইনিট ----------
+    renderPresetButtons();
+    loadSettings();
+  </script>
+
+</body>
+</html>

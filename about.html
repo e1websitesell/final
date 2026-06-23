@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About</title>
+<style>
+  :root {
+    --primary-color: #1a1d29; --accent-color: #6b7280; --site-font: system-ui, sans-serif;
+    --btn-radius: 8px; --ink: #1a1d29; --ink-soft: #6b7280; --line: #e5e7eb; --bg: #f7f7f9;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--site-font); color: var(--ink); background: #fff; }
+  a { text-decoration: none; color: inherit; }
+  .site-header { border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 10; }
+  .header-inner { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; }
+  .brand img { height: 34px; width: auto; }
+  .main-nav { display: flex; align-items: center; gap: 26px; font-size: 14.5px; font-weight: 500; }
+  .cart-link { position: relative; }
+  .cart-badge { position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+  .lang-toggle { border: 1px solid var(--line); background: #fff; padding: 7px 14px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit; }
+  .page-inner { max-width: 720px; margin: 0 auto; padding: 50px 20px 70px; line-height: 1.8; font-size: 15px; color: var(--ink); }
+  .page-inner h1 { font-size: 26px; margin-bottom: 24px; font-weight: 700; }
+  .page-inner h2 { font-size: 17px; margin: 26px 0 10px; font-weight: 700; }
+  .page-inner p { margin: 0 0 14px; color: var(--ink-soft); }
+  .site-footer { border-top: 1px solid var(--line); padding: 28px 20px; margin-top: 40px; }
+  .footer-inner { max-width: 1140px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13.5px; color: var(--ink-soft); }
+  .footer-links { display: flex; gap: 18px; }
+</style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <img id="logoImg" src="" alt="" style="display:none;">
+        <span id="shopNameText"></span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html" data-i18n="home">হোম</a>
+        <a href="shop.html" data-i18n="shop">শপ</a>
+        <a href="cart.html" class="cart-link">
+          <span data-i18n="cart">কার্ট</span>
+          <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
+        </a>
+        <a href="login.html" data-i18n="login">লগইন</a>
+      </nav>
+      <button id="langToggle" class="lang-toggle">English</button>
+    </div>
+  </header>
+
+  <main class="page-inner">
+    <div class="lang-bn">
+      <h1>আমাদের সম্পর্কে</h1>
+      <p>আমরা মান নিয়ে কোনো আপস করি না — প্রতিটা প্রোডাক্ট যত্নসহকারে বাছাই করা হয়, যাতে আপনি নিশ্চিন্তে অর্ডার করতে পারেন।</p>
+      <h2>আমাদের লক্ষ্য</h2>
+      <p>সহজ, বিশ্বাসযোগ্য আর দ্রুত শপিং এক্সপেরিয়েন্স দেওয়াই আমাদের মূল লক্ষ্য — অর্ডার করার পর হোম ডেলিভারির মাধ্যমে আপনার দরজায় পৌঁছে যাবে প্রোডাক্ট।</p>
+      <h2>যোগাযোগ</h2>
+      <p>কোনো প্রশ্ন থাকলে <a href="contact.html" style="color:var(--primary-color); font-weight:600;">যোগাযোগ পেজ</a> থেকে আমাদের সাথে যুক্ত হতে পারেন।</p>
+    </div>
+    <div class="lang-en">
+      <h1>About Us</h1>
+      <p>We don't compromise on quality — every product is carefully selected so you can order with confidence.</p>
+      <h2>Our Mission</h2>
+      <p>Our goal is to give you a simple, trustworthy, and fast shopping experience — your order is delivered straight to your door.</p>
+      <h2>Get in Touch</h2>
+      <p>Have a question? Reach us through our <a href="contact.html" style="color:var(--primary-color); font-weight:600;">contact page</a>.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span><span id="footerShopName"></span> © <span id="footerYear"></span></span>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { loadThemeAndSettings } from "./assets/js/theme-loader.js";
+    import { getLang, setLang, applyTranslations } from "./assets/js/translations.js";
+    import { updateCartBadge } from "./assets/js/cart.js";
+
+    document.getElementById("langToggle").addEventListener("click", () => {
+      setLang(getLang() === "bn" ? "en" : "bn");
+      location.reload();
+    });
+
+    async function init() {
+      applyTranslations();
+      updateCartBadge();
+      const lang = getLang();
+      document.getElementById("langToggle").textContent = lang === "bn" ? "English" : "বাংলা";
+      document.querySelectorAll(".lang-bn").forEach((el) => el.style.display = lang === "bn" ? "block" : "none");
+      document.querySelectorAll(".lang-en").forEach((el) => el.style.display = lang === "en" ? "block" : "none");
+
+      try {
+        const settings = await loadThemeAndSettings();
+        const shopName = lang === "bn" ? (settings.shopName_bn || settings.shopName_en) : (settings.shopName_en || settings.shopName_bn);
+        document.title = "About — " + (shopName || "Shop");
+        document.getElementById("shopNameText").textContent = shopName || "Shop";
+        document.getElementById("footerShopName").textContent = shopName || "Shop";
+        if (settings.logoUrl) {
+          const logoImg = document.getElementById("logoImg");
+          logoImg.src = settings.logoUrl;
+          logoImg.style.display = "inline-block";
+        }
+      } catch (e) {
+        console.error("শপ ইনফো লোড করতে সমস্যা হয়েছে:", e);
+      }
+      document.getElementById("footerYear").textContent = new Date().getFullYear();
+    }
+    init();
+  </script>
+
+</body>
+</html>

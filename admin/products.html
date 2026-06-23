@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>প্রোডাক্ট — Shop Admin</title>
+<style>
+  :root {
+    --ink: #1a1d29; --ink-soft: #6b7280; --line: #e5e7eb; --bg: #f7f7f9;
+    --accent: #3730a3; --accent-soft: #eef2ff; --sidebar: #1a1d29; --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--ink); background: var(--bg); }
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; flex-shrink: 0; background: var(--sidebar); color: #fff; padding: 24px 16px; display: flex; flex-direction: column; }
+  .sidebar .logo { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #9ca3af; padding: 0 10px 20px; }
+  .sidebar nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .sidebar nav a { color: #d1d5db; text-decoration: none; padding: 10px 12px; border-radius: 8px; font-size: 14.5px; }
+  .sidebar nav a:hover { background: rgba(255,255,255,0.06); }
+  .sidebar nav a.active { background: var(--accent); color: #fff; font-weight: 600; }
+  .logout-btn { background: transparent; border: 1px solid #374151; color: #d1d5db; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 14px; font-family: inherit; }
+  .logout-btn:hover { background: rgba(255,255,255,0.06); }
+  .content { flex: 1; padding: 32px 36px; max-width: 1100px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .topbar h1 { font-size: 22px; margin: 0; font-weight: 600; }
+  .user-email { font-size: 13.5px; color: var(--ink-soft); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 28px; }
+  .card h2 { margin: 0 0 18px; font-size: 16px; font-weight: 600; }
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .field { flex: 1; min-width: 220px; }
+  .field label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+  .field input, .field select, .field textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 14.5px; font-family: inherit; color: var(--ink); }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .hint { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .checkbox-row label { font-size: 14.5px; }
+  .image-uploader { margin-bottom: 16px; }
+  .image-input-row { display: flex; gap: 8px; }
+  .image-input-row input[type="text"] { flex: 1; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 14.5px; font-family: inherit; }
+  .image-previews { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .img-thumb { position: relative; width: 72px; height: 72px; }
+  .img-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+  .img-thumb button { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; border: none; background: #b91c1c; color: #fff; font-size: 11px; cursor: pointer; line-height: 1; }
+  #variantsSection { display: none; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 4px; }
+  table.variant-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+  table.variant-table th, table.variant-table td { padding: 6px 6px; text-align: left; }
+  table.variant-table th { font-size: 12px; color: var(--ink-soft); text-transform: uppercase; }
+  table.variant-table input { width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; font-size: 13.5px; font-family: inherit; }
+  .small-btn { border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .small-btn.add { background: var(--accent-soft); color: var(--accent); }
+  .small-btn.remove { background: #fef2f2; color: #b91c1c; }
+  .actions-row { display: flex; gap: 10px; align-items: center; }
+  button.primary { background: var(--accent); color: #fff; border: none; padding: 11px 22px; border-radius: 8px; font-size: 14.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  button.secondary { background: #fff; color: var(--ink-soft); border: 1px solid var(--line); padding: 11px 18px; border-radius: 8px; font-size: 14.5px; cursor: pointer; font-family: inherit; }
+  table.list-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.list-table th, table.list-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  table.list-table th { color: var(--ink-soft); font-weight: 600; font-size: 12.5px; text-transform: uppercase; }
+  .row-thumb { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; }
+  .muted { color: var(--ink-soft); font-size: 13.5px; }
+  .edit-btn, .delete-btn { border: none; border-radius: 6px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; margin-right: 6px; font-family: inherit; }
+  .edit-btn { background: var(--accent-soft); color: var(--accent); }
+  .delete-btn { background: #fef2f2; color: #b91c1c; }
+</style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Shop Admin</div>
+      <nav>
+        <a href="dashboard.html">ড্যাশবোর্ড</a>
+        <a href="products.html" class="active">প্রোডাক্ট</a>
+        <a href="upload-csv.html">CSV আপলোড</a>
+        <a href="categories.html">ক্যাটাগরি</a>
+        <a href="coupons.html">কুপন</a>
+        <a href="reviews.html">রিভিউ</a>
+        <a href="settings.html">সেটিংস</a>
+      </nav>
+      <button class="logout-btn" id="logoutBtn">লগআউট</button>
+    </aside>
+
+    <main class="content">
+      <div class="topbar">
+        <h1>প্রোডাক্ট</h1>
+        <span class="user-email" id="userEmail"></span>
+      </div>
+
+      <div class="card">
+        <h2 id="formTitle">নতুন প্রোডাক্ট</h2>
+        <form id="productForm">
+          <div class="form-row">
+            <div class="field"><label for="name_bn">নাম (বাংলা) *</label><input type="text" id="name_bn" required></div>
+            <div class="field"><label for="name_en">নাম (English) *</label><input type="text" id="name_en" required></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="description_bn">বর্ণনা (বাংলা)</label><textarea id="description_bn"></textarea></div>
+            <div class="field"><label for="description_en">বর্ণনা (English)</label><textarea id="description_en"></textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="basePrice">দাম (৳) *</label><input type="number" id="basePrice" min="0" step="0.01" required></div>
+            <div class="field"><label for="discountPrice">ডিসকাউন্ট প্রাইস (৳)</label><input type="number" id="discountPrice" min="0" step="0.01"></div>
+            <div class="field">
+              <label for="category">ক্যাটাগরি *</label>
+              <select id="category" required><option value="">লোড হচ্ছে...</option></select>
+              <div class="hint" id="categoryHint"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="tags">ট্যাগ (কমা দিয়ে আলাদা করুন)</label><input type="text" id="tags" placeholder="যেমন: মাস্ক, গ্রীষ্মকালীন, বেস্টসেলার"></div>
+          </div>
+
+          <div class="image-uploader">
+            <label>প্রোডাক্ট ছবি</label>
+            <div class="image-input-row">
+              <input type="text" id="imageUrlInput" placeholder="ছবির লিংক পেস্ট করুন (https://...)">
+              <button type="button" class="small-btn add" id="addImageUrlBtn">যুক্ত করুন</button>
+            </div>
+            <div class="hint">নিজে কোথাও ছবি হোস্ট করা থাকলে লিংক পেস্ট করুন, অথবা নিচে থেকে সরাসরি আপলোড করুন।</div>
+            <input type="file" id="imageInput" accept="image/*" multiple style="margin-top:12px;">
+            <span class="hint" id="uploadStatus"></span>
+            <div class="image-previews" id="imagePreviews"></div>
+          </div>
+
+          <div class="checkbox-row">
+            <input type="checkbox" id="hasVariants">
+            <label for="hasVariants">এই প্রোডাক্টে ভ্যারিয়েন্ট আছে (সাইজ/কালার/ভলিউম)</label>
+          </div>
+          <div class="hint" id="noVariantHint">ভ্যারিয়েন্ট না থাকলে অর্ডার কোড হিসেবে প্রোডাক্টের নিজের আইডি ব্যবহার হবে।</div>
+
+          <div id="variantsSection">
+            <table class="variant-table">
+              <thead><tr><th>ভ্যারিয়েন্ট নাম</th><th>প্রোডাক্ট কোড</th><th>প্রাইস ওভাররাইড</th><th>স্টকে আছে</th><th></th></tr></thead>
+              <tbody id="variantsBody"></tbody>
+            </table>
+            <button type="button" class="small-btn add" id="addVariantBtn">+ ভ্যারিয়েন্ট যুক্ত করুন</button>
+          </div>
+
+          <div class="actions-row" style="margin-top: 22px;">
+            <button type="submit" class="primary" id="saveBtn">সেভ করুন</button>
+            <button type="button" class="secondary" id="cancelEditBtn" style="display:none;">এডিট বাতিল করুন</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>সব প্রোডাক্ট</h2>
+        <table class="list-table">
+          <thead><tr><th>ছবি</th><th>নাম</th><th>ক্যাটাগরি</th><th>দাম</th><th>ভ্যারিয়েন্ট</th><th>একশন</th></tr></thead>
+          <tbody id="productsBody"><tr><td colspan="6" class="muted">লোড হচ্ছে...</td></tr></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { requireAdmin, adminLogout } from "../assets/js/admin-auth-guard.js";
+    import { db } from "../assets/js/firebase-config.js";
+    import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from "../assets/js/cloudinary-config.js";
+    import {
+      collection, doc, addDoc, updateDoc, deleteDoc, getDoc, getDocs,
+      serverTimestamp, query, orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const user = await requireAdmin();
+    document.getElementById("userEmail").textContent = user.email;
+    document.getElementById("logoutBtn").addEventListener("click", adminLogout);
+
+    let images = [];
+    let variants = [];
+    let editingProductId = null;
+
+    function escapeAttr(str) {
+      return String(str ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    }
+
+    async function uploadToCloudinary(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
+      if (!res.ok) throw new Error("Cloudinary upload failed (HTTP " + res.status + ")");
+      const data = await res.json();
+      return data.secure_url;
+    }
+
+    function renderImagePreviews() {
+      const wrap = document.getElementById("imagePreviews");
+      wrap.innerHTML = images.map((url, i) =>
+        `<div class="img-thumb"><img src="${escapeAttr(url)}" alt=""><button type="button" class="img-remove" data-i="${i}">✕</button></div>`
+      ).join("");
+      wrap.querySelectorAll(".img-remove").forEach((btn) => {
+        btn.addEventListener("click", () => { images.splice(Number(btn.dataset.i), 1); renderImagePreviews(); });
+      });
+    }
+
+    document.getElementById("addImageUrlBtn").addEventListener("click", () => {
+      const input = document.getElementById("imageUrlInput");
+      const url = input.value.trim();
+      if (!url) return;
+      images.push(url);
+      input.value = "";
+      renderImagePreviews();
+    });
+
+    document.getElementById("imageInput").addEventListener("change", async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+      const status = document.getElementById("uploadStatus");
+      status.textContent = "আপলোড হচ্ছে...";
+      for (const file of files) {
+        try {
+          const url = await uploadToCloudinary(file);
+          images.push(url);
+        } catch (err) {
+          console.error("ছবি আপলোড করতে সমস্যা হয়েছে:", err);
+          alert("একটা ছবি আপলোড করতে সমস্যা হয়েছে: " + err.message + " (Cloudinary কনফিগ ঠিক আছে কিনা চেক করুন)");
+        }
+      }
+      status.textContent = "";
+      e.target.value = "";
+      renderImagePreviews();
+    });
+
+    function renderVariantRows() {
+      const body = document.getElementById("variantsBody");
+      body.innerHTML = variants.map((v, i) =>
+        `<tr>
+           <td><input type="text" class="v-name" data-i="${i}" value="${escapeAttr(v.variantName)}" placeholder="যেমন: 50ml"></td>
+           <td><input type="text" class="v-code" data-i="${i}" value="${escapeAttr(v.productCode)}" placeholder="JIRO-001-50"></td>
+           <td><input type="number" class="v-price" data-i="${i}" value="${v.priceOverride ?? ""}" placeholder="বেস প্রাইস" step="0.01"></td>
+           <td style="text-align:center;"><input type="checkbox" class="v-stock" data-i="${i}" ${v.inStock !== false ? "checked" : ""}></td>
+           <td><button type="button" class="small-btn remove v-remove" data-i="${i}">✕</button></td>
+         </tr>`
+      ).join("");
+
+      body.querySelectorAll(".v-name").forEach((el) => el.addEventListener("input", (e) => { variants[Number(e.target.dataset.i)].variantName = e.target.value; }));
+      body.querySelectorAll(".v-code").forEach((el) => el.addEventListener("input", (e) => { variants[Number(e.target.dataset.i)].productCode = e.target.value; }));
+      body.querySelectorAll(".v-price").forEach((el) => el.addEventListener("input", (e) => {
+        const val = e.target.value;
+        variants[Number(e.target.dataset.i)].priceOverride = val === "" ? null : Number(val);
+      }));
+      body.querySelectorAll(".v-stock").forEach((el) => el.addEventListener("change", (e) => { variants[Number(e.target.dataset.i)].inStock = e.target.checked; }));
+      body.querySelectorAll(".v-remove").forEach((el) => el.addEventListener("click", (e) => {
+        variants.splice(Number(e.target.dataset.i), 1);
+        renderVariantRows();
+      }));
+    }
+
+    document.getElementById("addVariantBtn").addEventListener("click", () => {
+      variants.push({ variantName: "", productCode: "", priceOverride: null, inStock: true });
+      renderVariantRows();
+    });
+
+    function toggleVariantsSection() {
+      const show = document.getElementById("hasVariants").checked;
+      document.getElementById("variantsSection").style.display = show ? "block" : "none";
+      document.getElementById("noVariantHint").style.display = show ? "none" : "block";
+    }
+    document.getElementById("hasVariants").addEventListener("change", toggleVariantsSection);
+
+    async function loadCategories() {
+      const select = document.getElementById("category");
+      const hint = document.getElementById("categoryHint");
+      try {
+        const snap = await getDocs(collection(db, "categories"));
+        if (snap.empty) {
+          select.innerHTML = `<option value="">কোনো ক্যাটাগরি নেই</option>`;
+          hint.textContent = "আগে \"ক্যাটাগরি\" পেজ থেকে অন্তত একটা ক্যাটাগরি বানান।";
+          return;
+        }
+        const options = [];
+        snap.forEach((docSnap) => {
+          const c = docSnap.data();
+          if (c.slug) options.push({ slug: c.slug, label: (c.name_bn || c.slug) + " / " + (c.name_en || c.slug) });
+        });
+        select.innerHTML = `<option value="">বাছাই করুন</option>` +
+          options.map((o) => `<option value="${escapeAttr(o.slug)}">${escapeAttr(o.label)}</option>`).join("");
+        hint.textContent = "";
+      } catch (e) {
+        console.error("ক্যাটাগরি লোড করতে সমস্যা হয়েছে:", e);
+        select.innerHTML = `<option value="">লোড করতে সমস্যা হয়েছে</option>`;
+        hint.textContent = "কনসোল (F12) চেক করুন।";
+      }
+    }
+
+    async function loadProducts() {
+      const tbody = document.getElementById("productsBody");
+      tbody.innerHTML = `<tr><td colspan="6" class="muted">লোড হচ্ছে...</td></tr>`;
+      try {
+        const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+          tbody.innerHTML = `<tr><td colspan="6" class="muted">কোনো প্রোডাক্ট নেই, উপরের ফর্ম দিয়ে প্রথমটা যুক্ত করুন।</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = "";
+        snap.forEach((docSnap) => {
+          const p = docSnap.data();
+          const thumb = (p.images && p.images[0]) ? `<img class="row-thumb" src="${escapeAttr(p.images[0])}" alt="">` : `<span class="muted">—</span>`;
+          const price = p.discountPrice ? `৳${p.discountPrice} <span class="muted">(৳${p.basePrice})</span>` : `৳${p.basePrice}`;
+          const variantInfo = p.hasVariants ? `${(p.variants || []).length} ভ্যারিয়েন্ট` : "—";
+
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            `<td>${thumb}</td>` +
+            `<td>${escapeAttr(p.name_bn)}<br><span class="muted">${escapeAttr(p.name_en)}</span></td>` +
+            `<td>${escapeAttr(p.category)}</td>` +
+            `<td>${price}</td>` +
+            `<td>${variantInfo}</td>` +
+            `<td><button class="edit-btn" data-id="${docSnap.id}">এডিট</button><button class="delete-btn" data-id="${docSnap.id}">ডিলিট</button></td>`;
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll(".edit-btn").forEach((b) => b.addEventListener("click", () => startEdit(b.dataset.id)));
+        tbody.querySelectorAll(".delete-btn").forEach((b) => b.addEventListener("click", () => deleteProduct(b.dataset.id)));
+      } catch (e) {
+        console.error("প্রোডাক্ট লোড করতে সমস্যা হয়েছে:", e);
+        tbody.innerHTML = `<tr><td colspan="6" class="muted">প্রোডাক্ট লোড করতে সমস্যা হয়েছে। কনসোল (F12) চেক করুন।</td></tr>`;
+      }
+    }
+
+    async function startEdit(productId) {
+      try {
+        const snap = await getDoc(doc(db, "products", productId));
+        if (!snap.exists()) return;
+        const p = snap.data();
+        editingProductId = productId;
+
+        document.getElementById("formTitle").textContent = "এডিট করছেন: " + (p.name_bn || p.name_en || "");
+        document.getElementById("name_bn").value = p.name_bn || "";
+        document.getElementById("name_en").value = p.name_en || "";
+        document.getElementById("description_bn").value = p.description_bn || "";
+        document.getElementById("description_en").value = p.description_en || "";
+        document.getElementById("basePrice").value = p.basePrice ?? "";
+        document.getElementById("discountPrice").value = p.discountPrice ?? "";
+        document.getElementById("category").value = p.category || "";
+        document.getElementById("tags").value = (p.tags || []).join(", ");
+
+        images = Array.isArray(p.images) ? [...p.images] : [];
+        renderImagePreviews();
+
+        document.getElementById("hasVariants").checked = !!p.hasVariants;
+        variants = Array.isArray(p.variants) ? p.variants.map((v) => ({ ...v })) : [];
+        renderVariantRows();
+        toggleVariantsSection();
+
+        document.getElementById("cancelEditBtn").style.display = "inline-block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (e) {
+        console.error("প্রোডাক্ট লোড করতে সমস্যা হয়েছে:", e);
+        alert("প্রোডাক্ট লোড করতে সমস্যা হয়েছে: " + e.message);
+      }
+    }
+
+    function resetForm() {
+      editingProductId = null;
+      document.getElementById("formTitle").textContent = "নতুন প্রোডাক্ট";
+      document.getElementById("productForm").reset();
+      images = [];
+      variants = [];
+      renderImagePreviews();
+      renderVariantRows();
+      toggleVariantsSection();
+      document.getElementById("cancelEditBtn").style.display = "none";
+    }
+    document.getElementById("cancelEditBtn").addEventListener("click", resetForm);
+
+    async function deleteProduct(productId) {
+      if (!confirm("প্রোডাক্টটা ডিলিট করতে চান? এটা ফিরিয়ে আনা যাবে না।")) return;
+      try {
+        await deleteDoc(doc(db, "products", productId));
+        if (editingProductId === productId) resetForm();
+        loadProducts();
+      } catch (e) {
+        console.error("ডিলিট করতে সমস্যা হয়েছে:", e);
+        alert("ডিলিট করতে সমস্যা হয়েছে: " + e.message);
+      }
+    }
+
+    document.getElementById("productForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name_bn = document.getElementById("name_bn").value.trim();
+      const name_en = document.getElementById("name_en").value.trim();
+      const basePriceVal = document.getElementById("basePrice").value;
+      const category = document.getElementById("category").value.trim();
+
+      if (!name_bn || !name_en || !basePriceVal || !category) {
+        alert("নাম (বাংলা + ইংরেজি), দাম, আর ক্যাটাগরি দেওয়া বাধ্যতামূলক।");
+        return;
+      }
+
+      const hasVariants = document.getElementById("hasVariants").checked;
+      if (hasVariants) {
+        if (variants.length === 0) {
+          alert("ভ্যারিয়েন্ট অপশন অন করেছেন, অন্তত একটা ভ্যারিয়েন্ট যুক্ত করুন।");
+          return;
+        }
+        const invalid = variants.some((v) => !v.variantName?.trim() || !v.productCode?.trim());
+        if (invalid) {
+          alert("প্রতিটা ভ্যারিয়েন্টে নাম আর প্রোডাক্ট কোড দেওয়া বাধ্যতামূলক।");
+          return;
+        }
+      }
+
+      const discountPriceVal = document.getElementById("discountPrice").value;
+      const tagsRaw = document.getElementById("tags").value.trim();
+      const tags = tagsRaw ? tagsRaw.split(",").map((t) => t.trim()).filter(Boolean) : [];
+
+      const productData = {
+        name_bn, name_en,
+        description_bn: document.getElementById("description_bn").value.trim(),
+        description_en: document.getElementById("description_en").value.trim(),
+        basePrice: Number(basePriceVal),
+        discountPrice: discountPriceVal ? Number(discountPriceVal) : null,
+        category, images, tags, hasVariants,
+        variants: hasVariants ? variants : []
+      };
+
+      const saveBtn = document.getElementById("saveBtn");
+      saveBtn.disabled = true;
+      saveBtn.textContent = "সেভ হচ্ছে...";
+
+      try {
+        if (editingProductId) {
+          await updateDoc(doc(db, "products", editingProductId), productData);
+        } else {
+          productData.avgRating = 0;
+          productData.reviewCount = 0;
+          productData.createdAt = serverTimestamp();
+          await addDoc(collection(db, "products"), productData);
+        }
+        resetForm();
+        loadProducts();
+      } catch (err) {
+        console.error("সেভ করতে সমস্যা হয়েছে:", err);
+        alert("সেভ করতে সমস্যা হয়েছে: " + err.message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "সেভ করুন";
+      }
+    });
+
+    renderImagePreviews();
+    renderVariantRows();
+    toggleVariantsSection();
+    loadCategories();
+    loadProducts();
+  </script>
+
+</body>
+</html>

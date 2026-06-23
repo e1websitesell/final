@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>কুপন — Shop Admin</title>
+<style>
+  :root {
+    --ink: #1a1d29; --ink-soft: #6b7280; --line: #e5e7eb; --bg: #f7f7f9;
+    --accent: #3730a3; --accent-soft: #eef2ff; --sidebar: #1a1d29;
+    --ok: #15803d; --ok-bg: #f0fdf4; --err: #b91c1c; --err-bg: #fef2f2; --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--ink); background: var(--bg); }
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; flex-shrink: 0; background: var(--sidebar); color: #fff; padding: 24px 16px; display: flex; flex-direction: column; }
+  .sidebar .logo { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #9ca3af; padding: 0 10px 20px; }
+  .sidebar nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .sidebar nav a { color: #d1d5db; text-decoration: none; padding: 10px 12px; border-radius: 8px; font-size: 14.5px; }
+  .sidebar nav a:hover { background: rgba(255,255,255,0.06); }
+  .sidebar nav a.active { background: var(--accent); color: #fff; font-weight: 600; }
+  .logout-btn { background: transparent; border: 1px solid #374151; color: #d1d5db; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 14px; font-family: inherit; }
+  .logout-btn:hover { background: rgba(255,255,255,0.06); }
+  .content { flex: 1; padding: 32px 36px; max-width: 1100px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .topbar h1 { font-size: 22px; margin: 0; font-weight: 600; }
+  .user-email { font-size: 13.5px; color: var(--ink-soft); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 28px; }
+  .card h2 { margin: 0 0 18px; font-size: 16px; font-weight: 600; }
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .field { flex: 1; min-width: 200px; }
+  .field label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+  .field input, .field select { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 14.5px; font-family: inherit; color: var(--ink); }
+  .hint { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .checkbox-row label { font-size: 14.5px; }
+  .actions-row { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
+  button.primary { background: var(--accent); color: #fff; border: none; padding: 11px 22px; border-radius: 8px; font-size: 14.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  button.secondary { background: #fff; color: var(--ink-soft); border: 1px solid var(--line); padding: 11px 18px; border-radius: 8px; font-size: 14.5px; cursor: pointer; font-family: inherit; }
+  table.list-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.list-table th, table.list-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  table.list-table th { color: var(--ink-soft); font-weight: 600; font-size: 12.5px; text-transform: uppercase; }
+  .muted { color: var(--ink-soft); font-size: 13.5px; }
+  code { background: var(--bg); padding: 2px 6px; border-radius: 4px; font-size: 12.5px; }
+  .edit-btn, .delete-btn { border: none; border-radius: 6px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; margin-right: 6px; font-family: inherit; }
+  .edit-btn { background: var(--accent-soft); color: var(--accent); }
+  .delete-btn { background: #fef2f2; color: #b91c1c; }
+  .status-btn { border: none; border-radius: 6px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+  .status-active { background: var(--ok-bg); color: var(--ok); }
+  .status-inactive { background: var(--err-bg); color: var(--err); }
+</style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Shop Admin</div>
+      <nav>
+        <a href="dashboard.html">ড্যাশবোর্ড</a>
+        <a href="products.html">প্রোডাক্ট</a>
+        <a href="upload-csv.html">CSV আপলোড</a>
+        <a href="categories.html">ক্যাটাগরি</a>
+        <a href="coupons.html" class="active">কুপন</a>
+        <a href="reviews.html">রিভিউ</a>
+        <a href="settings.html">সেটিংস</a>
+      </nav>
+      <button class="logout-btn" id="logoutBtn">লগআউট</button>
+    </aside>
+
+    <main class="content">
+      <div class="topbar">
+        <h1>কুপন</h1>
+        <span class="user-email" id="userEmail"></span>
+      </div>
+
+      <div class="card">
+        <h2 id="formTitle">নতুন কুপন</h2>
+        <form id="couponForm">
+          <div class="form-row">
+            <div class="field"><label for="code">কুপন কোড *</label><input type="text" id="code" required placeholder="SAVE10"><div class="hint">বড় হাতের অক্ষরে সেভ হবে।</div></div>
+            <div class="field">
+              <label for="discountType">ডিসকাউন্ট টাইপ</label>
+              <select id="discountType"><option value="percentage">শতাংশ (%)</option><option value="fixed">ফিক্সড টাকা (৳)</option></select>
+            </div>
+            <div class="field"><label for="discountValue">ডিসকাউন্ট ভ্যালু *</label><input type="number" id="discountValue" min="0" step="0.01" required></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="minOrderAmount">মিনিমাম অর্ডার (৳)</label><input type="number" id="minOrderAmount" min="0" step="0.01" placeholder="0"></div>
+            <div class="field"><label for="expiryDate">মেয়াদ শেষ হবে</label><input type="date" id="expiryDate"></div>
+            <div class="field"><label for="usageLimit">ইউজ লিমিট</label><input type="number" id="usageLimit" min="1" placeholder="ফাঁকা রাখলে সীমাহীন"></div>
+          </div>
+          <div class="checkbox-row"><input type="checkbox" id="active" checked><label for="active">অ্যাকটিভ</label></div>
+          <div class="actions-row">
+            <button type="submit" class="primary" id="saveBtn">সেভ করুন</button>
+            <button type="button" class="secondary" id="cancelEditBtn" style="display:none;">এডিট বাতিল করুন</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>সব কুপন</h2>
+        <table class="list-table">
+          <thead><tr><th>কোড</th><th>ডিসকাউন্ট</th><th>মিনিমাম অর্ডার</th><th>মেয়াদ</th><th>ইউজ</th><th>স্ট্যাটাস</th><th>একশন</th></tr></thead>
+          <tbody id="couponsBody"><tr><td colspan="7" class="muted">লোড হচ্ছে...</td></tr></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { requireAdmin, adminLogout } from "../assets/js/admin-auth-guard.js";
+    import { db } from "../assets/js/firebase-config.js";
+    import {
+      collection, doc, setDoc, updateDoc, deleteDoc, getDoc, getDocs, Timestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const user = await requireAdmin();
+    document.getElementById("userEmail").textContent = user.email;
+    document.getElementById("logoutBtn").addEventListener("click", adminLogout);
+
+    let originalCode = null;
+
+    function escapeAttr(str) {
+      return String(str ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    }
+
+    async function loadCoupons() {
+      const tbody = document.getElementById("couponsBody");
+      tbody.innerHTML = `<tr><td colspan="7" class="muted">লোড হচ্ছে...</td></tr>`;
+      try {
+        const snap = await getDocs(collection(db, "coupons"));
+        if (snap.empty) {
+          tbody.innerHTML = `<tr><td colspan="7" class="muted">কোনো কুপন নেই, উপরের ফর্ম দিয়ে প্রথমটা বানান।</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = "";
+        snap.forEach((docSnap) => {
+          const c = docSnap.data();
+          const discountText = c.discountType === "fixed" ? `৳${c.discountValue}` : `${c.discountValue}%`;
+          const expiryText = (c.expiryDate && c.expiryDate.toDate) ? c.expiryDate.toDate().toLocaleDateString("bn-BD") : "—";
+          const usageText = c.usageLimit ? `${c.usageCount || 0} / ${c.usageLimit}` : `${c.usageCount || 0} / সীমাহীন`;
+          const statusBtn = c.active
+            ? `<button class="status-btn status-active" data-id="${docSnap.id}">অ্যাকটিভ</button>`
+            : `<button class="status-btn status-inactive" data-id="${docSnap.id}">বন্ধ</button>`;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            `<td><code>${escapeAttr(docSnap.id)}</code></td>` +
+            `<td>${discountText}</td>` +
+            `<td>৳${c.minOrderAmount || 0}+</td>` +
+            `<td>${expiryText}</td>` +
+            `<td>${usageText}</td>` +
+            `<td>${statusBtn}</td>` +
+            `<td><button class="edit-btn" data-id="${docSnap.id}">এডিট</button><button class="delete-btn" data-id="${docSnap.id}">ডিলিট</button></td>`;
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll(".status-btn").forEach((b) => b.addEventListener("click", () => toggleActive(b.dataset.id)));
+        tbody.querySelectorAll(".edit-btn").forEach((b) => b.addEventListener("click", () => startEdit(b.dataset.id)));
+        tbody.querySelectorAll(".delete-btn").forEach((b) => b.addEventListener("click", () => deleteCoupon(b.dataset.id)));
+      } catch (e) {
+        console.error("কুপন লোড করতে সমস্যা হয়েছে:", e);
+        tbody.innerHTML = `<tr><td colspan="7" class="muted">লোড করতে সমস্যা হয়েছে। কনসোল (F12) চেক করুন।</td></tr>`;
+      }
+    }
+
+    async function toggleActive(code) {
+      try {
+        const snap = await getDoc(doc(db, "coupons", code));
+        if (!snap.exists()) return;
+        await updateDoc(doc(db, "coupons", code), { active: !snap.data().active });
+        loadCoupons();
+      } catch (e) {
+        console.error("আপডেট করতে সমস্যা হয়েছে:", e);
+        alert("আপডেট করতে সমস্যা হয়েছে: " + e.message);
+      }
+    }
+
+    async function startEdit(code) {
+      try {
+        const snap = await getDoc(doc(db, "coupons", code));
+        if (!snap.exists()) return;
+        const c = snap.data();
+        originalCode = code;
+
+        document.getElementById("formTitle").textContent = "এডিট করছেন: " + code;
+        document.getElementById("code").value = code;
+        document.getElementById("discountType").value = c.discountType || "percentage";
+        document.getElementById("discountValue").value = c.discountValue ?? "";
+        document.getElementById("minOrderAmount").value = c.minOrderAmount ?? "";
+        document.getElementById("expiryDate").value = (c.expiryDate && c.expiryDate.toDate) ? c.expiryDate.toDate().toISOString().split("T")[0] : "";
+        document.getElementById("usageLimit").value = c.usageLimit ?? "";
+        document.getElementById("active").checked = c.active !== false;
+
+        document.getElementById("cancelEditBtn").style.display = "inline-block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (e) {
+        console.error("কুপন লোড করতে সমস্যা হয়েছে:", e);
+        alert("কুপন লোড করতে সমস্যা হয়েছে: " + e.message);
+      }
+    }
+
+    function resetForm() {
+      originalCode = null;
+      document.getElementById("formTitle").textContent = "নতুন কুপন";
+      document.getElementById("couponForm").reset();
+      document.getElementById("active").checked = true;
+      document.getElementById("cancelEditBtn").style.display = "none";
+    }
+    document.getElementById("cancelEditBtn").addEventListener("click", resetForm);
+
+    async function deleteCoupon(code) {
+      if (!confirm("কুপনটা ডিলিট করতে চান?")) return;
+      try {
+        await deleteDoc(doc(db, "coupons", code));
+        if (originalCode === code) resetForm();
+        loadCoupons();
+      } catch (e) {
+        console.error("ডিলিট করতে সমস্যা হয়েছে:", e);
+        alert("ডিলিট করতে সমস্যা হয়েছে: " + e.message);
+      }
+    }
+
+    document.getElementById("couponForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const code = document.getElementById("code").value.trim().toUpperCase();
+      const discountType = document.getElementById("discountType").value;
+      const discountValueRaw = document.getElementById("discountValue").value;
+      const minOrderRaw = document.getElementById("minOrderAmount").value;
+      const expiryRaw = document.getElementById("expiryDate").value;
+      const usageLimitRaw = document.getElementById("usageLimit").value;
+      const active = document.getElementById("active").checked;
+
+      if (!code || !discountValueRaw) {
+        alert("কোড আর ডিসকাউন্ট ভ্যালু দেওয়া বাধ্যতামূলক।");
+        return;
+      }
+
+      const saveBtn = document.getElementById("saveBtn");
+      saveBtn.disabled = true;
+      saveBtn.textContent = "সেভ হচ্ছে...";
+
+      try {
+        if (code !== originalCode) {
+          const existing = await getDoc(doc(db, "coupons", code));
+          if (existing.exists()) {
+            alert("এই কোড আগে থেকেই আছে, আরেকটা দিন।");
+            saveBtn.disabled = false;
+            saveBtn.textContent = "সেভ করুন";
+            return;
+          }
+        }
+
+        const data = {
+          discountType,
+          discountValue: Number(discountValueRaw),
+          minOrderAmount: minOrderRaw ? Number(minOrderRaw) : 0,
+          expiryDate: expiryRaw ? Timestamp.fromDate(new Date(expiryRaw)) : null,
+          usageLimit: usageLimitRaw ? Number(usageLimitRaw) : null,
+          active
+        };
+
+        if (originalCode && originalCode !== code) {
+          const oldSnap = await getDoc(doc(db, "coupons", originalCode));
+          data.usageCount = oldSnap.exists() ? (oldSnap.data().usageCount || 0) : 0;
+          await deleteDoc(doc(db, "coupons", originalCode));
+        } else if (!originalCode) {
+          data.usageCount = 0;
+        }
+
+        await setDoc(doc(db, "coupons", code), data, { merge: !!originalCode && originalCode === code });
+
+        resetForm();
+        loadCoupons();
+      } catch (err) {
+        console.error("সেভ করতে সমস্যা হয়েছে:", err);
+        alert("সেভ করতে সমস্যা হয়েছে: " + err.message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "সেভ করুন";
+      }
+    });
+
+    loadCoupons();
+  </script>
+
+</body>
+</html>
