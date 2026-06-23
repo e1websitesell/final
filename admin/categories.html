@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>ক্যাটাগরি — Shop Admin</title>
+<style>
+  :root {
+    --ink: #1a1d29;
+    --ink-soft: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f7f7f9;
+    --accent: #3730a3;
+    --accent-soft: #eef2ff;
+    --sidebar: #1a1d29;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--ink); background: var(--bg); }
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar { width: 220px; flex-shrink: 0; background: var(--sidebar); color: #fff; padding: 24px 16px; display: flex; flex-direction: column; }
+  .sidebar .logo { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #9ca3af; padding: 0 10px 20px; }
+  .sidebar nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .sidebar nav a { color: #d1d5db; text-decoration: none; padding: 10px 12px; border-radius: 8px; font-size: 14.5px; }
+  .sidebar nav a:hover { background: rgba(255,255,255,0.06); }
+  .sidebar nav a.active { background: var(--accent); color: #fff; font-weight: 600; }
+  .logout-btn { background: transparent; border: 1px solid #374151; color: #d1d5db; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 14px; font-family: inherit; }
+  .logout-btn:hover { background: rgba(255,255,255,0.06); }
+
+  .content { flex: 1; padding: 32px 36px; max-width: 1000px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .topbar h1 { font-size: 22px; margin: 0; font-weight: 600; }
+  .user-email { font-size: 13.5px; color: var(--ink-soft); }
+
+  .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 28px; }
+  .card h2 { margin: 0 0 18px; font-size: 16px; font-weight: 600; }
+
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .field { flex: 1; min-width: 220px; }
+  .field label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+  .field input { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 14.5px; font-family: inherit; color: var(--ink); }
+  .hint { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+
+  .image-uploader { margin-bottom: 16px; }
+  .image-input-row { display: flex; gap: 8px; }
+  .image-input-row input[type="text"] { flex: 1; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 14.5px; font-family: inherit; }
+  .image-previews { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .img-thumb { position: relative; width: 72px; height: 72px; }
+  .img-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+  .img-thumb button { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; border: none; background: #b91c1c; color: #fff; font-size: 11px; cursor: pointer; line-height: 1; }
+
+  .small-btn { border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .small-btn.add { background: var(--accent-soft); color: var(--accent); }
+
+  .actions-row { display: flex; gap: 10px; align-items: center; margin-top: 22px; }
+  button.primary { background: var(--accent); color: #fff; border: none; padding: 11px 22px; border-radius: 8px; font-size: 14.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  button.secondary { background: #fff; color: var(--ink-soft); border: 1px solid var(--line); padding: 11px 18px; border-radius: 8px; font-size: 14.5px; cursor: pointer; font-family: inherit; }
+
+  table.list-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.list-table th, table.list-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  table.list-table th { color: var(--ink-soft); font-weight: 600; font-size: 12.5px; text-transform: uppercase; }
+  .row-thumb { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; }
+  .muted { color: var(--ink-soft); font-size: 13.5px; }
+  .edit-btn, .delete-btn { border: none; border-radius: 6px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; margin-right: 6px; font-family: inherit; }
+  .edit-btn { background: var(--accent-soft); color: var(--accent); }
+  .delete-btn { background: #fef2f2; color: #b91c1c; }
+</style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Shop Admin</div>
+      <nav>
+        <a href="dashboard.html">ড্যাশবোর্ড</a>
+        <a href="products.html">প্রোডাক্ট</a>
+        <a href="upload-csv.html">CSV আপলোড</a>
+        <a href="categories.html" class="active">ক্যাটাগরি</a>
+        <a href="coupons.html">কুপন</a>
+        <a href="reviews.html">রিভিউ</a>
+        <a href="settings.html">সেটিংস</a>
+      </nav>
+      <button class="logout-btn" id="logoutBtn">লগআউট</button>
+    </aside>
+
+    <main class="content">
+      <div class="topbar">
+        <h1>ক্যাটাগরি</h1>
+        <span class="user-email" id="userEmail"></span>
+      </div>
+
+      <div class="card">
+        <h2 id="formTitle">নতুন ক্যাটাগরি</h2>
+        <form id="categoryForm">
+
+          <div class="form-row">
+            <div class="field">
+              <label for="name_bn">নাম (বাংলা) *</label>
+              <input type="text" id="name_bn" required>
+            </div>
+            <div class="field">
+              <label for="name_en">নাম (English) *</label>
+              <input type="text" id="name_en" required>
+            </div>
+            <div class="field">
+              <label for="slug">স্লাগ *</label>
+              <input type="text" id="slug" required placeholder="auto-generate হবে">
+              <div class="hint">এটাই প্রোডাক্ট ফর্মে ক্যাটাগরি সিলেক্ট করতে ব্যবহার হবে, ইংরেজি নাম থেকে অটো-জেনারেট হবে।</div>
+            </div>
+          </div>
+
+          <div class="image-uploader">
+            <label>ক্যাটাগরি ছবি (অপশনাল)</label>
+            <div class="image-input-row">
+              <input type="text" id="imageUrlInput" placeholder="ছবির লিংক পেস্ট করুন (https://...)">
+              <button type="button" class="small-btn add" id="addImageUrlBtn">যুক্ত করুন</button>
+            </div>
+            <input type="file" id="imageInput" accept="image/*" style="margin-top:12px;">
+            <span class="hint" id="uploadStatus"></span>
+            <div class="image-previews" id="imagePreviews"></div>
+          </div>
+
+          <div class="actions-row">
+            <button type="submit" class="primary" id="saveBtn">সেভ করুন</button>
+            <button type="button" class="secondary" id="cancelEditBtn" style="display:none;">এডিট বাতিল করুন</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>সব ক্যাটাগরি</h2>
+        <table class="list-table">
+          <thead>
+            <tr><th>ছবি</th><th>নাম</th><th>স্লাগ</th><th>একশন</th></tr>
+          </thead>
+          <tbody id="categoriesBody">
+            <tr><td colspan="4" class="muted">লোড হচ্ছে...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script type="module">
+    import { requireAdmin, adminLogout } from "../assets/js/admin-auth-guard.js";
+    import { db } from "../assets/js/firebase-config.js";
+    import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from "../assets/js/cloudinary-config.js";
+    import {
+      collection, doc, addDoc, updateDoc, deleteDoc, getDoc, getDocs,
+      query, where, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const user = await requireAdmin();
+    document.getElementById("userEmail").textContent = user.email;
+    document.getElementById("logoutBtn").addEventListener("click", adminLogout);
+
+    // ---------- স্টেট ----------
+    let categoryImage = null;
+    let editingCategoryId = null;
+    let slugEdited = false;
+
+    // ---------- হেল্পার ----------
+    function escapeAttr(str) {
+      return String(str ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    }
+
+    function slugify(str) {
+      return str.trim().toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
+    }
+
+    document.getElementById("slug").addEventListener("input", () => { slugEdited = true; });
+    document.getElementById("name_en").addEventListener("input", (e) => {
+      if (!slugEdited) {
+        document.getElementById("slug").value = slugify(e.target.value);
+      }
+    });
+
+    async function uploadToCloudinary(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+        { method: "POST", body: formData }
+      );
+      if (!res.ok) throw new Error("Cloudinary upload failed");
+      const data = await res.json();
+      return data.secure_url;
+    }
+
+    // ---------- ছবি (একটাই) ----------
+    function renderImagePreview() {
+      const wrap = document.getElementById("imagePreviews");
+      if (!categoryImage) { wrap.innerHTML = ""; return; }
+      wrap.innerHTML =
+        `<div class="img-thumb">
+           <img src="${escapeAttr(categoryImage)}" alt="">
+           <button type="button" id="removeImageBtn">✕</button>
+         </div>`;
+      document.getElementById("removeImageBtn").addEventListener("click", () => {
+        categoryImage = null;
+        renderImagePreview();
+      });
+    }
+
+    document.getElementById("addImageUrlBtn").addEventListener("click", () => {
+      const input = document.getElementById("imageUrlInput");
+      const url = input.value.trim();
+      if (!url) return;
+      categoryImage = url;
+      input.value = "";
+      renderImagePreview();
+    });
+
+    document.getElementById("imageInput").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const status = document.getElementById("uploadStatus");
+      status.textContent = "আপলোড হচ্ছে...";
+      try {
+        categoryImage = await uploadToCloudinary(file);
+      } catch (err) {
+        alert("ছবি আপলোড করতে সমস্যা হয়েছে। Cloudinary কনফিগ চেক করুন।");
+      }
+      status.textContent = "";
+      e.target.value = "";
+      renderImagePreview();
+    });
+
+    // ---------- লিস্ট ----------
+    async function loadCategories() {
+      const tbody = document.getElementById("categoriesBody");
+      tbody.innerHTML = `<tr><td colspan="4" class="muted">লোড হচ্ছে...</td></tr>`;
+      try {
+        const snap = await getDocs(collection(db, "categories"));
+        if (snap.empty) {
+          tbody.innerHTML = `<tr><td colspan="4" class="muted">কোনো ক্যাটাগরি নেই, উপরের ফর্ম দিয়ে প্রথমটা বানান।</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = "";
+        snap.forEach((docSnap) => {
+          const c = docSnap.data();
+          const thumb = c.imageUrl
+            ? `<img class="row-thumb" src="${escapeAttr(c.imageUrl)}" alt="">`
+            : `<span class="muted">—</span>`;
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            `<td>${thumb}</td>` +
+            `<td>${escapeAttr(c.name_bn)}<br><span class="muted">${escapeAttr(c.name_en)}</span></td>` +
+            `<td>${escapeAttr(c.slug)}</td>` +
+            `<td>
+               <button class="edit-btn" data-id="${docSnap.id}">এডিট</button>
+               <button class="delete-btn" data-id="${docSnap.id}" data-slug="${escapeAttr(c.slug)}">ডিলিট</button>
+             </td>`;
+          tbody.appendChild(tr);
+        });
+        tbody.querySelectorAll(".edit-btn").forEach((b) => b.addEventListener("click", () => startEdit(b.dataset.id)));
+        tbody.querySelectorAll(".delete-btn").forEach((b) => b.addEventListener("click", () => deleteCategory(b.dataset.id, b.dataset.slug)));
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="4" class="muted">লোড করতে সমস্যা হয়েছে।</td></tr>`;
+      }
+    }
+
+    // ---------- এডিট ----------
+    async function startEdit(categoryId) {
+      try {
+        const snap = await getDoc(doc(db, "categories", categoryId));
+        if (!snap.exists()) return;
+        const c = snap.data();
+        editingCategoryId = categoryId;
+        slugEdited = true; // এডিটের সময় অটো-স্লাগ ওভাররাইট বন্ধ রাখা হচ্ছে
+
+        document.getElementById("formTitle").textContent = "এডিট করছেন: " + (c.name_bn || c.name_en || "");
+        document.getElementById("name_bn").value = c.name_bn || "";
+        document.getElementById("name_en").value = c.name_en || "";
+        document.getElementById("slug").value = c.slug || "";
+
+        categoryImage = c.imageUrl || null;
+        renderImagePreview();
+
+        document.getElementById("cancelEditBtn").style.display = "inline-block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (e) {
+        alert("ক্যাটাগরি লোড করতে সমস্যা হয়েছে।");
+      }
+    }
+
+    function resetForm() {
+      editingCategoryId = null;
+      slugEdited = false;
+      document.getElementById("formTitle").textContent = "নতুন ক্যাটাগরি";
+      document.getElementById("categoryForm").reset();
+      categoryImage = null;
+      renderImagePreview();
+      document.getElementById("cancelEditBtn").style.display = "none";
+    }
+    document.getElementById("cancelEditBtn").addEventListener("click", resetForm);
+
+    // ---------- ডিলিট ----------
+    async function deleteCategory(categoryId, slug) {
+      try {
+        const usageQuery = query(collection(db, "products"), where("category", "==", slug));
+        const usageSnap = await getDocs(usageQuery);
+        const message = usageSnap.empty
+          ? "ক্যাটাগরিটা ডিলিট করতে চান?"
+          : `এই ক্যাটাগরিতে ${usageSnap.size} টা প্রোডাক্ট আছে। ডিলিট করলেও ওই প্রোডাক্টগুলো ঠিক থাকবে, কিন্তু ক্যাটাগরি ড্রপডাউনে এটা আর দেখাবে না। তাও ডিলিট করতে চান?`;
+        if (!confirm(message)) return;
+
+        await deleteDoc(doc(db, "categories", categoryId));
+        if (editingCategoryId === categoryId) resetForm();
+        loadCategories();
+      } catch (e) {
+        alert("ডিলিট করতে সমস্যা হয়েছে।");
+      }
+    }
+
+    // ---------- সাবমিট ----------
+    document.getElementById("categoryForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name_bn = document.getElementById("name_bn").value.trim();
+      const name_en = document.getElementById("name_en").value.trim();
+      const slug = document.getElementById("slug").value.trim();
+
+      if (!name_bn || !name_en || !slug) {
+        alert("নাম (বাংলা + ইংরেজি) আর স্লাগ দেওয়া বাধ্যতামূলক।");
+        return;
+      }
+
+      const saveBtn = document.getElementById("saveBtn");
+      saveBtn.disabled = true;
+      saveBtn.textContent = "চেক করা হচ্ছে...";
+
+      try {
+        const dupQuery = query(collection(db, "categories"), where("slug", "==", slug));
+        const dupSnap = await getDocs(dupQuery);
+        const duplicate = dupSnap.docs.find((d) => d.id !== editingCategoryId);
+        if (duplicate) {
+          alert("এই স্লাগ আগের একটা ক্যাটাগরিতে ব্যবহার হয়ে গেছে, আলাদা স্লাগ দিন।");
+          saveBtn.disabled = false;
+          saveBtn.textContent = "সেভ করুন";
+          return;
+        }
+      } catch (e) {
+        // চেক ফেইল করলেও সেভ আটকানো হচ্ছে না, এটা নিরাপত্তার জন্য একস্ট্রা সাহায্য মাত্র
+      }
+
+      const categoryData = { name_bn, name_en, slug, imageUrl: categoryImage || null };
+      saveBtn.textContent = "সেভ হচ্ছে...";
+
+      try {
+        if (editingCategoryId) {
+          await updateDoc(doc(db, "categories", editingCategoryId), categoryData);
+        } else {
+          categoryData.createdAt = serverTimestamp();
+          await addDoc(collection(db, "categories"), categoryData);
+        }
+        resetForm();
+        loadCategories();
+      } catch (err) {
+        alert("সেভ করতে সমস্যা হয়েছে।");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "সেভ করুন";
+      }
+    });
+
+    // ---------- ইনিট ----------
+    renderImagePreview();
+    loadCategories();
+  </script>
+
+</body>
+</html>
