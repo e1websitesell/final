@@ -1,0 +1,14 @@
+# jibon
+
+
+
+## Pages
+- Shop: https://e1websitesell.github.io/final//shop.html
+- About: https://e1websitesell.github.io/final//about.html
+- Contact: https://e1websitesell.github.io/final//contact.html
+
+## Categories
+- web: https://e1websitesell.github.io/final//shop.html?category=web
+
+## Products
+2 products available. See sitemap.xml for the full list.
