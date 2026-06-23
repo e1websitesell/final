@@ -1,0 +1,452 @@
+<!DOCTYPE html><html lang="bn"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Levi's 501 Jeans — jibon</title>
+<style>
+  :root {
+    --primary-color: #1a1d29;
+    --accent-color: #6b7280;
+    --site-font: system-ui, sans-serif;
+    --btn-radius: 8px;
+    --ink: #1a1d29;
+    --ink-soft: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f7f7f9;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--site-font); color: var(--ink); background: #fff; }
+  a { text-decoration: none; color: inherit; }
+  .muted { color: var(--ink-soft); font-size: 14px; }
+
+  .site-header { border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 10; }
+  .header-inner { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; }
+  .brand img { height: 34px; width: auto; }
+  .main-nav { display: flex; align-items: center; gap: 26px; font-size: 14.5px; font-weight: 500; }
+  .cart-link { position: relative; }
+  .cart-badge { position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+  .lang-toggle { border: 1px solid var(--line); background: #fff; padding: 7px 14px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit; }
+
+  .page-inner { max-width: 1140px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  .product-layout { display: flex; gap: 40px; flex-wrap: wrap; margin-bottom: 50px; }
+  .gallery { flex: 1; min-width: 280px; max-width: 480px; }
+  .main-image { width: 100%; height: 420px; border-radius: 12px; background-size: cover; background-position: center; background-color: var(--bg); margin-bottom: 12px; }
+  .thumb-strip { display: flex; gap: 8px; flex-wrap: wrap; }
+  .thumb { width: 60px; height: 60px; border-radius: 8px; background-size: cover; background-position: center; background-color: var(--bg); cursor: pointer; border: 2px solid transparent; }
+  .thumb.active { border-color: var(--primary-color); }
+
+  .product-details { flex: 1; min-width: 280px; }
+  .product-details h1 { font-size: 24px; margin: 0 0 8px; font-weight: 700; }
+  .stars { color: #d97706; letter-spacing: 1px; }
+  .rating-summary { margin-bottom: 14px; font-size: 14px; }
+  .price-block { font-size: 22px; margin-bottom: 18px; }
+  .price-now { font-weight: 700; }
+  .price-old { text-decoration: line-through; color: var(--ink-soft); font-size: 16px; margin-left: 8px; }
+  .product-description { color: var(--ink-soft); line-height: 1.7; margin-bottom: 20px; font-size: 14.5px; }
+
+  .variant-options { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .variant-btn { border: 1px solid var(--line); background: #fff; padding: 9px 16px; border-radius: var(--btn-radius); font-size: 13.5px; cursor: pointer; font-family: inherit; }
+  .variant-btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+  .variant-btn:disabled { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+
+  .qty-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .qty-row input { width: 70px; padding: 9px; border: 1px solid var(--line); border-radius: var(--btn-radius); font-size: 14.5px; font-family: inherit; }
+
+  .add-to-cart-btn { background: var(--primary-color); color: #fff; border: none; padding: 14px 30px; border-radius: var(--btn-radius); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .add-to-cart-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .tags-row { font-size: 13px; color: var(--ink-soft); margin-top: 16px; }
+
+  .reviews-section { border-top: 1px solid var(--line); padding-top: 36px; }
+  .reviews-section h2 { font-size: 19px; margin: 0 0 20px; font-weight: 700; }
+  .review-item { padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .review-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 13.5px; }
+  .review-name { font-weight: 600; }
+  .review-comment { font-size: 14px; color: var(--ink); }
+
+  .review-form { margin-top: 24px; max-width: 480px; }
+  .review-form label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+  .review-form select, .review-form textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: var(--btn-radius); font-size: 14px; font-family: inherit; margin-bottom: 14px; }
+  .review-form button { background: var(--primary-color); color: #fff; border: none; padding: 10px 22px; border-radius: var(--btn-radius); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .login-prompt { font-size: 14px; color: var(--ink-soft); margin-top: 20px; }
+  .login-prompt a { color: var(--primary-color); font-weight: 600; }
+
+  .not-found { padding: 80px 20px; text-align: center; color: var(--ink-soft); }
+
+  .site-footer { border-top: 1px solid var(--line); padding: 28px 20px; margin-top: 40px; }
+  .footer-inner { max-width: 1140px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13.5px; color: var(--ink-soft); }
+  .footer-links { display: flex; gap: 18px; }
+</style>
+<meta name="description" content="Original blue jeans. Classic fit and durable fabric."><meta property="og:title" content="Levi's 501 Jeans"><meta property="og:description" content="Original blue jeans. Classic fit and durable fabric."><meta property="og:image" content="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400"><link rel="canonical" href="https://e1websitesell.github.io/final//product/ngbySAYMPTHidfnHb7tW.html"><script type="application/ld+json">{"@context":"https://schema.org/","@type":"Product","name":"Levi's 501 Jeans","description":"Original blue jeans. Classic fit and durable fabric.","image":["https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400","https://images.unsplash.com/photo-1555689502-c4b22d76c56f?w=400"],"sku":"ngbySAYMPTHidfnHb7tW","offers":{"@type":"Offer","price":7000,"priceCurrency":"BDT","availability":"https://schema.org/InStock"}}</script></head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="brand">
+        <img id="logoImg" src="" alt="" style="display:none;">
+        <span id="shopNameText"></span>
+      </a>
+      <nav class="main-nav">
+        <a href="../index.html" data-i18n="home">হোম</a>
+        <a href="../shop.html" data-i18n="shop">শপ</a>
+        <a href="../cart.html" class="cart-link">
+          <span data-i18n="cart">কার্ট</span>
+          <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
+        </a>
+        <a href="../login.html" data-i18n="login">লগইন</a>
+      </nav>
+      <button id="langToggle" class="lang-toggle">English</button>
+    </div>
+  </header>
+
+  <main class="page-inner">
+    <p class="not-found" id="notFound" style="display:none;">প্রোডাক্ট পাওয়া যায়নি।</p>
+
+    <div id="productWrap">
+      <div class="product-layout">
+        <div class="gallery">
+          <div class="main-image" id="mainImage" style="background-image:url('https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400')"></div>
+          <div class="thumb-strip" id="thumbStrip"><div class="thumb active" data-img="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400" style="background-image:url('https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400');"></div><div class="thumb" data-img="https://images.unsplash.com/photo-1555689502-c4b22d76c56f?w=400" style="background-image:url('https://images.unsplash.com/photo-1555689502-c4b22d76c56f?w=400');"></div></div>
+        </div>
+
+        <div class="product-details">
+          <h1 id="productName">Levi's 501 Jeans</h1>
+          <div class="rating-summary" id="ratingSummary"></div>
+          <div class="price-block">
+            <span class="price-now" id="priceNow">৳7000</span>
+            <span class="price-old" id="priceOld" style="display:inline">৳8000</span>
+          </div>
+          <p class="product-description" id="productDesc">Original blue jeans. Classic fit and durable fabric.</p>
+
+          <div id="variantSection" style="display:none;">
+            <div class="variant-options" id="variantOptions"></div>
+          </div>
+
+          <div class="qty-row">
+            <label for="qtyInput" class="muted">Qty</label>
+            <input type="number" id="qtyInput" value="1" min="1">
+            <button type="button" class="add-to-cart-btn" id="addToCartBtn" data-i18n="add_to_cart">কার্টে যুক্ত করুন</button>
+          </div>
+
+          <div class="tags-row" id="tagsRow">জিন্স · লেভিস · ক্যাসুয়াল</div>
+        </div>
+      </div>
+
+      <section class="reviews-section">
+        <h2>রিভিউ</h2>
+        <div id="reviewsList"></div>
+
+        <div class="review-form" id="reviewFormWrap" style="display:none;">
+          <form id="reviewForm">
+            <label for="reviewRating">রেটিং</label>
+            <select id="reviewRating">
+              <option value="5">★★★★★ (5)</option>
+              <option value="4">★★★★☆ (4)</option>
+              <option value="3">★★★☆☆ (3)</option>
+              <option value="2">★★☆☆☆ (2)</option>
+              <option value="1">★☆☆☆☆ (1)</option>
+            </select>
+            <label for="reviewComment">কমেন্ট</label>
+            <textarea id="reviewComment" rows="3"></textarea>
+            <button type="submit" id="reviewSubmitBtn">সাবমিট করুন</button>
+          </form>
+        </div>
+        <p class="login-prompt" id="reviewLoginPrompt" style="display:none;">
+          রিভিউ লিখতে <a href="../login.html">লগইন করুন</a>।
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span><span id="footerShopName"></span> © <span id="footerYear"></span></span>
+      <div class="footer-links">
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../privacy-policy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { db, auth } from "../assets/js/firebase-config.js";
+    import { loadThemeAndSettings, trackAddToCart } from "../assets/js/theme-loader.js";
+    import { getLang, setLang, applyTranslations, t } from "../assets/js/translations.js";
+    import { addToCart, updateCartBadge } from "../assets/js/cart.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      doc, getDoc, updateDoc, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    function escapeAttr(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;");
+    }
+
+    document.getElementById("langToggle").addEventListener("click", () => {
+      setLang(getLang() === "bn" ? "en" : "bn");
+      location.reload();
+    });
+
+    const urlParams = new URLSearchParams(location.search);
+    const pathMatch = location.pathname.match(/\/product\/([^/]+)\.html$/);
+    const productId = urlParams.get("id") || (pathMatch ? pathMatch[1] : null);
+
+    let productData = null;
+    let selectedVariantIndex = 0;
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      const formWrap = document.getElementById("reviewFormWrap");
+      const loginPrompt = document.getElementById("reviewLoginPrompt");
+      formWrap.style.display = user ? "block" : "none";
+      loginPrompt.style.display = user ? "none" : "block";
+    });
+
+    function getCurrentVariant() {
+      if (productData && productData.hasVariants && productData.variants && productData.variants.length) {
+        return productData.variants[selectedVariantIndex];
+      }
+      return null;
+    }
+
+    function renderRatingSummary() {
+      const avg = productData.avgRating || 0;
+      const count = productData.reviewCount || 0;
+      const rounded = Math.round(avg);
+      const stars = "★".repeat(rounded) + "☆".repeat(5 - rounded);
+      const lang = getLang();
+      document.getElementById("ratingSummary").innerHTML =
+        `<span class="stars">${stars}</span> <span class="muted">${avg.toFixed(1)} (${count} ${lang === "bn" ? "রিভিউ" : "reviews"})</span>`;
+    }
+
+    function updatePriceDisplay() {
+      const variant = getCurrentVariant();
+      const price = variant && variant.priceOverride != null
+        ? variant.priceOverride
+        : (productData.discountPrice || productData.basePrice);
+      const oldPrice = (!variant && productData.discountPrice) ? productData.basePrice : null;
+
+      document.getElementById("priceNow").textContent = "৳" + price;
+      document.getElementById("priceOld").textContent = oldPrice ? "৳" + oldPrice : "";
+      document.getElementById("priceOld").style.display = oldPrice ? "inline" : "none";
+
+      const inStock = !variant || variant.inStock !== false;
+      const btn = document.getElementById("addToCartBtn");
+      btn.disabled = !inStock;
+      btn.textContent = inStock ? t("add_to_cart") : (getLang() === "bn" ? "স্টকে নেই" : "Out of stock");
+    }
+
+    function renderVariantOptions() {
+      const wrap = document.getElementById("variantOptions");
+      wrap.innerHTML = productData.variants.map((v, i) =>
+        `<button type="button" class="variant-btn ${i === selectedVariantIndex ? "active" : ""}" data-i="${i}" ${v.inStock === false ? "disabled" : ""}>
+           ${escapeAttr(v.variantName)}
+         </button>`
+      ).join("");
+      wrap.querySelectorAll(".variant-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          selectedVariantIndex = Number(btn.dataset.i);
+          wrap.querySelectorAll(".variant-btn").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          updatePriceDisplay();
+        });
+      });
+    }
+
+    function renderProduct() {
+      const lang = getLang();
+      const name = lang === "bn" ? (productData.name_bn || productData.name_en) : (productData.name_en || productData.name_bn);
+      const desc = lang === "bn" ? (productData.description_bn || productData.description_en) : (productData.description_en || productData.description_bn);
+
+      document.title = (name || "Product") + " — Shop";
+      document.getElementById("productName").textContent = name || "";
+      document.getElementById("productDesc").textContent = desc || "";
+
+      const images = (productData.images && productData.images.length) ? productData.images : [];
+      document.getElementById("mainImage").style.backgroundImage = images[0] ? `url('${escapeAttr(images[0])}')` : "none";
+      document.getElementById("thumbStrip").innerHTML = images.map((img, i) =>
+        `<div class="thumb ${i === 0 ? "active" : ""}" data-img="${escapeAttr(img)}" style="background-image:url('${escapeAttr(img)}');"></div>`
+      ).join("");
+      document.getElementById("thumbStrip").querySelectorAll(".thumb").forEach((th) => {
+        th.addEventListener("click", () => {
+          document.getElementById("thumbStrip").querySelectorAll(".thumb").forEach((x) => x.classList.remove("active"));
+          th.classList.add("active");
+          document.getElementById("mainImage").style.backgroundImage = `url('${th.dataset.img}')`;
+        });
+      });
+
+      renderRatingSummary();
+
+      if (productData.hasVariants && productData.variants && productData.variants.length) {
+        document.getElementById("variantSection").style.display = "block";
+        renderVariantOptions();
+      } else {
+        document.getElementById("variantSection").style.display = "none";
+      }
+
+      updatePriceDisplay();
+      document.getElementById("tagsRow").textContent = (productData.tags || []).join(" · ");
+    }
+
+    async function recalcRating() {
+      try {
+        const snap = await getDocs(collection(db, "products", productId, "reviews"));
+        let total = 0, count = 0;
+        snap.forEach((d) => {
+          const r = d.data().rating;
+          if (typeof r === "number") { total += r; count++; }
+        });
+        const avgRating = count > 0 ? Math.round((total / count) * 10) / 10 : 0;
+        await updateDoc(doc(db, "products", productId), { avgRating, reviewCount: count });
+        productData.avgRating = avgRating;
+        productData.reviewCount = count;
+        renderRatingSummary();
+      } catch (e) {
+        console.error("রেটিং রিক্যালকুলেট করতে সমস্যা হয়েছে:", e);
+      }
+    }
+
+    async function loadReviews() {
+      const wrap = document.getElementById("reviewsList");
+      wrap.innerHTML = `<p class="muted">লোড হচ্ছে...</p>`;
+      try {
+        const q = query(collection(db, "products", productId, "reviews"), orderBy("createdAt", "desc"), limit(20));
+        const snap = await getDocs(q);
+        if (snap.empty) {
+          wrap.innerHTML = `<p class="muted">${getLang() === "bn" ? "এখনো কোনো রিভিউ নেই, প্রথম রিভিউ আপনিই দিন!" : "No reviews yet — be the first!"}</p>`;
+          return;
+        }
+        wrap.innerHTML = "";
+        snap.forEach((docSnap) => {
+          const r = docSnap.data();
+          const stars = "★".repeat(r.rating || 0) + "☆".repeat(5 - (r.rating || 0));
+          const time = (r.createdAt && r.createdAt.toDate) ? r.createdAt.toDate().toLocaleDateString() : "";
+          const item = document.createElement("div");
+          item.className = "review-item";
+          item.innerHTML =
+            `<div class="review-head"><span class="stars">${stars}</span> <span class="review-name">${escapeAttr(r.userName)}</span> <span class="muted">${time}</span></div>` +
+            `<div class="review-comment">${escapeAttr(r.comment || "")}</div>`;
+          wrap.appendChild(item);
+        });
+      } catch (e) {
+        console.error("রিভিউ লোড করতে সমস্যা হয়েছে:", e);
+        wrap.innerHTML = `<p class="muted">রিভিউ লোড করতে সমস্যা হয়েছে। কনসোল (F12) চেক করুন।</p>`;
+      }
+    }
+
+    document.getElementById("reviewForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const rating = Number(document.getElementById("reviewRating").value);
+      const comment = document.getElementById("reviewComment").value.trim();
+      const submitBtn = document.getElementById("reviewSubmitBtn");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "সাবমিট হচ্ছে...";
+
+      try {
+        await addDoc(collection(db, "products", productId, "reviews"), {
+          userId: currentUser.uid,
+          userName: currentUser.displayName || currentUser.email || "Customer",
+          rating,
+          comment,
+          productName_bn: productData.name_bn || "",
+          productName_en: productData.name_en || "",
+          createdAt: serverTimestamp()
+        });
+        await recalcRating();
+        document.getElementById("reviewComment").value = "";
+        loadReviews();
+      } catch (err) {
+        console.error("রিভিউ সাবমিট করতে সমস্যা হয়েছে:", err);
+        alert("রিভিউ সাবমিট করতে সমস্যা হয়েছে: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "সাবমিট করুন";
+      }
+    });
+
+    document.getElementById("addToCartBtn").addEventListener("click", () => {
+      const variant = getCurrentVariant();
+      const lang = getLang();
+      const name = lang === "bn" ? (productData.name_bn || productData.name_en) : (productData.name_en || productData.name_bn);
+      const qty = Math.max(1, Number(document.getElementById("qtyInput").value) || 1);
+      const price = variant && variant.priceOverride != null
+        ? variant.priceOverride
+        : (productData.discountPrice || productData.basePrice);
+
+      const item = {
+        productId,
+        variantCode: variant ? variant.productCode : productId,
+        variantName: variant ? variant.variantName : "",
+        name,
+        price,
+        image: (productData.images && productData.images[0]) || "",
+        qty
+      };
+
+      addToCart(item);
+      updateCartBadge();
+      trackAddToCart(item);
+
+      const btn = document.getElementById("addToCartBtn");
+      const original = btn.textContent;
+      btn.textContent = lang === "bn" ? "যুক্ত হয়েছে ✓" : "Added ✓";
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    });
+
+    async function loadProduct() {
+      if (!productId) {
+        document.getElementById("notFound").style.display = "block";
+        document.getElementById("productWrap").style.display = "none";
+        return;
+      }
+      try {
+        const snap = await getDoc(doc(db, "products", productId));
+        if (!snap.exists()) {
+          document.getElementById("notFound").style.display = "block";
+          document.getElementById("productWrap").style.display = "none";
+          return;
+        }
+        productData = snap.data();
+        renderProduct();
+        loadReviews();
+      } catch (e) {
+        console.error("প্রোডাক্ট লোড করতে সমস্যা হয়েছে:", e);
+        document.getElementById("notFound").textContent = "প্রোডাক্ট লোড করতে সমস্যা হয়েছে। কনসোল (F12) চেক করুন।";
+        document.getElementById("notFound").style.display = "block";
+        document.getElementById("productWrap").style.display = "none";
+      }
+    }
+
+    async function init() {
+      applyTranslations();
+      updateCartBadge();
+      document.getElementById("langToggle").textContent = getLang() === "bn" ? "English" : "বাংলা";
+
+      const settings = await loadThemeAndSettings();
+      const lang = getLang();
+      const shopName = lang === "bn" ? (settings.shopName_bn || settings.shopName_en) : (settings.shopName_en || settings.shopName_bn);
+      document.getElementById("shopNameText").textContent = shopName || "Shop";
+      document.getElementById("footerShopName").textContent = shopName || "Shop";
+      document.getElementById("footerYear").textContent = new Date().getFullYear();
+      if (settings.logoUrl) {
+        const logoImg = document.getElementById("logoImg");
+        logoImg.src = settings.logoUrl;
+        logoImg.style.display = "inline-block";
+      }
+
+      await loadProduct();
+    }
+
+    init();
+  </script>
+
+
+</body></html>
