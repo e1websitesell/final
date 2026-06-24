@@ -5,14 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shop</title>
 <meta name="description" content="">
-
-<!-- 🔥 পারফরম্যান্স বুস্ট: প্রিকানেক্ট ও প্রিফেচ -->
-<link rel="preconnect" href="https://website-bd41c.firebaseio.com">
-<link rel="preconnect" href="https://firestore.googleapis.com">
-<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-<link rel="dns-prefetch" href="https://fonts.googleapis.com">
-<link rel="dns-prefetch" href="https://res.cloudinary.com">
-
 <style>
   :root {
     --primary-color: #1a1d29;
@@ -28,36 +20,6 @@
   body { margin: 0; font-family: var(--site-font); color: var(--ink); background: #fff; }
   a { text-decoration: none; color: inherit; }
   .muted { color: var(--ink-soft); font-size: 14px; }
-
-  /* 🔥 লোডিং স্ক্রিন */
-  #loading-screen {
-    position: fixed;
-    inset: 0;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    font-size: 18px;
-    color: var(--ink-soft);
-    transition: opacity 0.6s ease;
-  }
-  #loading-screen.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-  #loading-screen .spinner {
-    width: 28px;
-    height: 28px;
-    border: 3px solid var(--line);
-    border-top-color: var(--accent-color);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-right: 12px;
-  }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
 
   .site-header { border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 10; }
   .header-inner { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
@@ -118,260 +80,206 @@
 </head>
 <body>
 
-<!-- 🔥 লোডিং স্ক্রিন -->
-<div id="loading-screen">
-  <div class="spinner"></div>
-  <span>লোড হচ্ছে...</span>
-</div>
-
-<header class="site-header">
-  <div class="header-inner">
-    <a href="index.html" class="brand">
-      <img id="logoImg" src="" alt="" style="display:none;">
-      <span id="shopNameText"></span>
-    </a>
-    <nav class="main-nav">
-      <a href="index.html" data-i18n="home">হোম</a>
-      <a href="shop.html" data-i18n="shop">শপ</a>
-      <a href="cart.html" class="cart-link">
-        <span data-i18n="cart">কার্ট</span>
-        <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <img id="logoImg" src="" alt="" style="display:none;">
+        <span id="shopNameText"></span>
       </a>
-      <a href="login.html" data-i18n="login">লগইন</a>
-    </nav>
-    <button id="langToggle" class="lang-toggle">English</button>
-  </div>
-</header>
-
-<section class="hero" id="heroSection">
-  <div class="hero-slides" id="heroSlides"></div>
-  <div class="hero-overlay">
-    <h1 id="heroTitle"></h1>
-    <a href="shop.html" class="cta-btn" data-i18n="shop_now">শপ করুন</a>
-  </div>
-</section>
-
-<section class="section">
-  <h2 data-i18n="categories">ক্যাটাগরি</h2>
-  <div class="category-grid" id="categoryGrid">
-    <p class="muted" id="categoryEmpty" style="display:none;"></p>
-  </div>
-</section>
-
-<section class="section">
-  <h2 data-i18n="featured_products">ফিচার্ড প্রোডাক্ট</h2>
-  <div class="product-grid" id="productGrid">
-    <p class="muted" id="productEmpty" style="display:none;"></p>
-  </div>
-</section>
-
-<footer class="site-footer">
-  <div class="footer-inner">
-    <span><span id="footerShopName"></span> © <span id="footerYear"></span></span>
-    <div class="footer-links">
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
-      <a href="privacy-policy.html">Privacy Policy</a>
+      <nav class="main-nav">
+        <a href="index.html" data-i18n="home">হোম</a>
+        <a href="shop.html" data-i18n="shop">শপ</a>
+        <a href="cart.html" class="cart-link">
+          <span data-i18n="cart">কার্ট</span>
+          <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
+        </a>
+        <a href="login.html" data-i18n="login">লগইন</a>
+      </nav>
+      <button id="langToggle" class="lang-toggle">English</button>
     </div>
-  </div>
-</footer>
+  </header>
 
-<script type="module">
-  // =====================================================
-  // 🔥 ইনডেক্স পেজ – ক্যাশিং + পারফরম্যান্স বুস্ট
-  // বাকি সব ফাংশনালিটি অপরিবর্তিত
-  // =====================================================
+  <section class="hero" id="heroSection">
+    <div class="hero-slides" id="heroSlides"></div>
+    <div class="hero-overlay">
+      <h1 id="heroTitle"></h1>
+      <a href="shop.html" class="cta-btn" data-i18n="shop_now">শপ করুন</a>
+    </div>
+  </section>
 
-  import { db } from "./assets/js/firebase-config.js";
-  import { loadThemeAndSettings } from "./assets/js/theme-loader.js";
-  import { getLang, setLang, applyTranslations } from "./assets/js/translations.js";
-  import { updateCartBadge } from "./assets/js/cart.js";
-  import {
-    collection, query, orderBy, limit, getDocs
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <section class="section">
+    <h2 data-i18n="categories">ক্যাটাগরি</h2>
+    <div class="category-grid" id="categoryGrid">
+      <p class="muted" id="categoryEmpty" style="display:none;"></p>
+    </div>
+  </section>
 
-  const CACHE_KEY = 'indexPageCache';
-  const CACHE_TTL = 3600000; // ১ ঘন্টা
+  <section class="section">
+    <h2 data-i18n="featured_products">ফিচার্ড প্রোডাক্ট</h2>
+    <div class="product-grid" id="productGrid">
+      <p class="muted" id="productEmpty" style="display:none;"></p>
+    </div>
+  </section>
 
-  function escapeAttr(str) {
-    return String(str ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/"/g, "&quot;")
-      .replace(/</g, "&lt;");
-  }
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span><span id="footerShopName"></span> © <span id="footerYear"></span></span>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
 
-  // ---------- ক্যাশ থেকে ডেটা রেন্ডার ----------
-  function renderFromCache(cache) {
-    const settings = cache.settings || {};
-    const categories = cache.categories || [];
-    const products = cache.products || [];
+  <script type="module">
+    import { db } from "./assets/js/firebase-config.js";
+    import { loadThemeAndSettings } from "./assets/js/theme-loader.js";
+    import { getLang, setLang, applyTranslations } from "./assets/js/translations.js";
+    import { updateCartBadge } from "./assets/js/cart.js";
+    import {
+      collection, query, orderBy, limit, getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const lang = getLang();
-    const shopName = lang === "bn"
-      ? (settings.shopName_bn || settings.shopName_en)
-      : (settings.shopName_en || settings.shopName_bn);
-
-    document.getElementById("shopNameText").textContent = shopName || "Shop";
-    document.title = shopName || "Shop";
-    document.getElementById("footerShopName").textContent = shopName || "Shop";
-
-    if (settings.logoUrl) {
-      const logoImg = document.getElementById("logoImg");
-      logoImg.src = settings.logoUrl;
-      logoImg.style.display = "inline-block";
+    function escapeAttr(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;");
     }
 
-    // হিরো ব্যানার
-    const banners = Array.isArray(settings.bannerImages) ? settings.bannerImages : [];
-    const slidesWrap = document.getElementById("heroSlides");
-    if (banners.length > 0) {
-      slidesWrap.innerHTML = banners.map((url, i) =>
-        `<div class="hero-slide ${i === 0 ? "active" : ""}" style="background-image:url('${escapeAttr(url)}');"></div>`
-      ).join("");
-      if (banners.length > 1) {
-        let idx = 0;
-        setInterval(() => {
-          const slides = slidesWrap.querySelectorAll(".hero-slide");
-          slides[idx].classList.remove("active");
-          idx = (idx + 1) % slides.length;
-          slides[idx].classList.add("active");
-        }, 4000);
-      }
-    }
+    document.getElementById("langToggle").addEventListener("click", () => {
+      setLang(getLang() === "bn" ? "en" : "bn");
+      location.reload();
+    });
 
-    const heroText = lang === "bn"
-      ? (settings.heroText_bn || settings.heroText_en)
-      : (settings.heroText_en || settings.heroText_bn);
-    document.getElementById("heroTitle").textContent = heroText || "";
+    function renderHero(settings) {
+      const banners = Array.isArray(settings.bannerImages) ? settings.bannerImages : [];
+      const slidesWrap = document.getElementById("heroSlides");
 
-    // ক্যাটাগরি
-    const grid = document.getElementById("categoryGrid");
-    const empty = document.getElementById("categoryEmpty");
-    if (categories.length === 0) {
-      empty.textContent = "এখনো কোনো ক্যাটাগরি নেই।";
-      empty.style.display = "block";
-    } else {
-      grid.innerHTML = "";
-      categories.forEach((c) => {
-        const name = lang === "bn" ? (c.name_bn || c.name_en) : (c.name_en || c.name_bn);
-        const card = document.createElement("a");
-        card.href = "shop.html?category=" + encodeURIComponent(c.slug || "");
-        card.className = "category-card";
-        if (c.imageUrl) card.style.backgroundImage = "url('" + escapeAttr(c.imageUrl) + "')";
-        card.innerHTML = "<span>" + escapeAttr(name) + "</span>";
-        grid.appendChild(card);
-      });
-    }
+      if (banners.length > 0) {
+        slidesWrap.innerHTML = banners.map((url, i) =>
+          `<div class="hero-slide ${i === 0 ? "active" : ""}" style="background-image:url('${escapeAttr(url)}');"></div>`
+        ).join("");
 
-    // প্রোডাক্ট
-    const pGrid = document.getElementById("productGrid");
-    const pEmpty = document.getElementById("productEmpty");
-    if (products.length === 0) {
-      pEmpty.textContent = "এখনো কোনো প্রোডাক্ট নেই।";
-      pEmpty.style.display = "block";
-    } else {
-      pGrid.innerHTML = "";
-      products.forEach((p) => {
-        const name = lang === "bn" ? (p.name_bn || p.name_en) : (p.name_en || p.name_bn);
-        const img = (p.images && p.images[0]) || "";
-        const price = p.discountPrice
-          ? "<span class='price-now'>৳" + p.discountPrice + "</span> <span class='price-old'>৳" + p.basePrice + "</span>"
-          : "<span class='price-now'>৳" + p.basePrice + "</span>";
-        const stars = p.avgRating ? "★".repeat(Math.round(p.avgRating)) : "";
-
-        const card = document.createElement("a");
-        card.href = "product/" + p.id + ".html";
-        card.className = "product-card";
-        card.innerHTML =
-          "<div class='product-img' style=\"background-image:url('" + escapeAttr(img) + "');\"></div>" +
-          "<div class='product-info'>" +
-            "<div class='product-name'>" + escapeAttr(name) + "</div>" +
-            (stars ? "<div class='product-stars'>" + stars + "</div>" : "") +
-            "<div class='product-price'>" + price + "</div>" +
-          "</div>";
-        pGrid.appendChild(card);
-      });
-    }
-
-    // লোডিং স্ক্রিন লুকান
-    document.getElementById("loading-screen").classList.add("hidden");
-  }
-
-  // ---------- Firebase থেকে ফ্রেশ ডেটা নিন ----------
-  async function loadFreshData() {
-    try {
-      const settings = await loadThemeAndSettings();
-      
-      // ক্যাটাগরি লোড
-      const catSnap = await getDocs(collection(db, "categories"));
-      const categories = [];
-      catSnap.forEach((d) => categories.push(d.data()));
-
-      // প্রোডাক্ট লোড
-      const q = query(collection(db, "products"), orderBy("createdAt", "desc"), limit(8));
-      const prodSnap = await getDocs(q);
-      const products = [];
-      prodSnap.forEach((d) => products.push(d.data()));
-
-      const cacheData = {
-        timestamp: Date.now(),
-        settings,
-        categories,
-        products
-      };
-
-      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-      renderFromCache(cacheData);
-    } catch (e) {
-      console.error("ডেটা লোড করতে সমস্যা হয়েছে:", e);
-      // ক্যাশ থাকলে সেটা দেখান
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        try {
-          const data = JSON.parse(cached);
-          renderFromCache(data);
-        } catch (_) {
-          // কিছুই না
+        if (banners.length > 1) {
+          let idx = 0;
+          setInterval(() => {
+            const slides = slidesWrap.querySelectorAll(".hero-slide");
+            slides[idx].classList.remove("active");
+            idx = (idx + 1) % slides.length;
+            slides[idx].classList.add("active");
+          }, 4000);
         }
       }
-      document.getElementById("loading-screen").classList.add("hidden");
+
+      const lang = getLang();
+      const heroText = lang === "bn"
+        ? (settings.heroText_bn || settings.heroText_en)
+        : (settings.heroText_en || settings.heroText_bn);
+      document.getElementById("heroTitle").textContent = heroText || "";
     }
-  }
 
-  // ---------- ইনিট ----------
-  document.getElementById("langToggle").addEventListener("click", () => {
-    setLang(getLang() === "bn" ? "en" : "bn");
-    location.reload();
-  });
-
-  async function init() {
-    applyTranslations();
-    updateCartBadge();
-    document.getElementById("langToggle").textContent = getLang() === "bn" ? "English" : "বাংলা";
-    document.getElementById("footerYear").textContent = new Date().getFullYear();
-
-    // 🔥 ক্যাশ চেক করুন
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
+    async function loadCategories() {
+      const grid = document.getElementById("categoryGrid");
+      const empty = document.getElementById("categoryEmpty");
       try {
-        const data = JSON.parse(cached);
-        const age = Date.now() - data.timestamp;
-        if (age < CACHE_TTL) {
-          // ক্যাশ ভালো, সাথে সাথে দেখান
-          renderFromCache(data);
-          // ব্যাকগ্রাউন্ডে ফ্রেশ ডেটা নিন (আপডেটের জন্য)
-          loadFreshData();
+        const snap = await getDocs(collection(db, "categories"));
+        if (snap.empty) {
+          empty.textContent = "এখনো কোনো ক্যাটাগরি নেই।";
+          empty.style.display = "block";
           return;
         }
-      } catch (_) {}
+        const lang = getLang();
+        grid.innerHTML = "";
+        snap.forEach((docSnap) => {
+          const c = docSnap.data();
+          const name = lang === "bn" ? (c.name_bn || c.name_en) : (c.name_en || c.name_bn);
+          const card = document.createElement("a");
+          card.href = "shop.html?category=" + encodeURIComponent(c.slug || "");
+          card.className = "category-card";
+          if (c.imageUrl) card.style.backgroundImage = "url('" + escapeAttr(c.imageUrl) + "')";
+          card.innerHTML = "<span>" + escapeAttr(name) + "</span>";
+          grid.appendChild(card);
+        });
+      } catch (e) {
+        console.error("ক্যাটাগরি লোড করতে সমস্যা হয়েছে:", e);
+        empty.textContent = "ক্যাটাগরি লোড করতে সমস্যা হয়েছে।";
+        empty.style.display = "block";
+      }
     }
 
-    // ক্যাশ নেই বা এক্সপায়ার্ড – ফ্রেশ ডেটা নিন
-    await loadFreshData();
-  }
+    async function loadFeaturedProducts() {
+      const grid = document.getElementById("productGrid");
+      const empty = document.getElementById("productEmpty");
+      try {
+        const q = query(collection(db, "products"), orderBy("createdAt", "desc"), limit(8));
+        const snap = await getDocs(q);
+        if (snap.empty) {
+          empty.textContent = "এখনো কোনো প্রোডাক্ট নেই।";
+          empty.style.display = "block";
+          return;
+        }
+        const lang = getLang();
+        grid.innerHTML = "";
+        snap.forEach((docSnap) => {
+          const p = docSnap.data();
+          const name = lang === "bn" ? (p.name_bn || p.name_en) : (p.name_en || p.name_bn);
+          const img = (p.images && p.images[0]) || "";
+          const price = p.discountPrice
+            ? "<span class='price-now'>৳" + p.discountPrice + "</span> <span class='price-old'>৳" + p.basePrice + "</span>"
+            : "<span class='price-now'>৳" + p.basePrice + "</span>";
+          const stars = p.avgRating ? "★".repeat(Math.round(p.avgRating)) : "";
 
-  init();
-</script>
+          const card = document.createElement("a");
+          // স্ট্যাটিক জেনারেটেড পেজে যাচ্ছে (SEO/GEO-এর জন্য), ?id= ফরম্যাট না
+          card.href = "product/" + docSnap.id + ".html";
+          card.className = "product-card";
+          card.innerHTML =
+            "<div class='product-img' style=\"background-image:url('" + escapeAttr(img) + "');\"></div>" +
+            "<div class='product-info'>" +
+              "<div class='product-name'>" + escapeAttr(name) + "</div>" +
+              (stars ? "<div class='product-stars'>" + stars + "</div>" : "") +
+              "<div class='product-price'>" + price + "</div>" +
+            "</div>";
+          grid.appendChild(card);
+        });
+      } catch (e) {
+        console.error("প্রোডাক্ট লোড করতে সমস্যা হয়েছে:", e);
+        empty.textContent = "প্রোডাক্ট লোড করতে সমস্যা হয়েছে।";
+        empty.style.display = "block";
+      }
+    }
+
+    async function init() {
+      applyTranslations();
+      updateCartBadge();
+      document.getElementById("langToggle").textContent = getLang() === "bn" ? "English" : "বাংলা";
+
+      const settings = await loadThemeAndSettings();
+      const lang = getLang();
+      const shopName = lang === "bn"
+        ? (settings.shopName_bn || settings.shopName_en)
+        : (settings.shopName_en || settings.shopName_bn);
+
+      document.getElementById("shopNameText").textContent = shopName || "Shop";
+      document.title = shopName || "Shop";
+      document.getElementById("footerShopName").textContent = shopName || "Shop";
+      document.getElementById("footerYear").textContent = new Date().getFullYear();
+
+      if (settings.logoUrl) {
+        const logoImg = document.getElementById("logoImg");
+        logoImg.src = settings.logoUrl;
+        logoImg.style.display = "inline-block";
+      }
+
+      renderHero(settings);
+      loadCategories();
+      loadFeaturedProducts();
+    }
+
+    init();
+  </script>
 
 </body>
 </html>
