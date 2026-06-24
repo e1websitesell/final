@@ -188,7 +188,7 @@
 
   <script>
     // =========================================================
-    // 🔥 স্ট্যাটিক ইনডেক্স – ল্যাঙ্গুয়েজ টগল (রিলোড ছাড়া)
+    // 🔥 স্ট্যাটিক ইনডেক্স – data-i18n দিয়ে ল্যাঙ্গুয়েজ টগল
     // =========================================================
     const translations = {
       bn: {
@@ -198,7 +198,8 @@
         login: "লগইন",
         shop_now: "শপ করুন",
         categories: "ক্যাটাগরি",
-        featured: "ফিচার্ড প্রোডাক্ট"
+        featured_products: "ফিচার্ড প্রোডাক্ট",
+        search_placeholder: "প্রোডাক্ট খুঁজুন..."
       },
       en: {
         home: "Home",
@@ -207,7 +208,8 @@
         login: "Login",
         shop_now: "Shop Now",
         categories: "Categories",
-        featured: "Featured Products"
+        featured_products: "Featured Products",
+        search_placeholder: "Search products..."
       }
     };
 
@@ -222,17 +224,28 @@
     function applyTranslations() {
       const lang = getLang();
       const t = translations[lang] || translations.bn;
-      document.getElementById('navHome').textContent = t.home;
-      document.getElementById('navShop').textContent = t.shop;
-      document.getElementById('navCart').textContent = t.cart;
-      document.getElementById('navLogin').textContent = t.login;
-      document.getElementById('ctaBtn').textContent = t.shop_now;
-      document.getElementById('categoriesTitle').textContent = t.categories;
-      document.getElementById('featuredTitle').textContent = t.featured;
-      document.getElementById('langToggle').textContent = lang === 'bn' ? 'English' : 'বাংলা';
+      // data-i18n অ্যাট্রিবিউটযুক্ত সব এলিমেন্ট আপডেট করি
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) {
+          el.textContent = t[key];
+        }
+      });
+      // data-i18n-placeholder অ্যাট্রিবিউটযুক্ত ইনপুট আপডেট
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (t[key] !== undefined) {
+          el.placeholder = t[key];
+        }
+      });
+      // টগল বাটনের টেক্সট আপডেট
+      const toggleBtn = document.getElementById('langToggle');
+      if (toggleBtn) {
+        toggleBtn.textContent = lang === 'bn' ? 'English' : 'বাংলা';
+      }
     }
 
-    document.getElementById('langToggle').addEventListener('click', function() {
+    document.getElementById('langToggle')?.addEventListener('click', function() {
       const newLang = getLang() === 'bn' ? 'en' : 'bn';
       setLang(newLang);
       applyTranslations();
