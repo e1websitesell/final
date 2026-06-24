@@ -3,32 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>শপ</title>
+<title>Shop</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js"></script>
 <style>
-  /* ====== আপনার আগের CSS (অপরিবর্তিত) ====== */
-  :root { --primary-color: #1a1d29; --accent-color: #6b7280; --site-font: system-ui, sans-serif; --btn-radius: 8px; --ink: #1a1d29; --ink-soft: #6b7280; --line: #e5e7eb; --bg: #f7f7f9; }
+  /* ===== আপনার আসল CSS (shop.html) ===== */
+  :root {
+    --primary-color: #1a1d29;
+    --accent-color: #6b7280;
+    --site-font: system-ui, sans-serif;
+    --btn-radius: 8px;
+    --ink: #1a1d29;
+    --ink-soft: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f7f7f9;
+  }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--site-font); color: var(--ink); background: #fff; }
   a { text-decoration: none; color: inherit; }
   .muted { color: var(--ink-soft); font-size: 14px; }
+
   .site-header { border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 10; }
   .header-inner { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
   .brand { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; }
   .brand img { height: 34px; width: auto; }
   .main-nav { display: flex; align-items: center; gap: 26px; font-size: 14.5px; font-weight: 500; }
   .cart-link { position: relative; }
-  .cart-badge { position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+  .cart-badge {
+    position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff;
+    font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; padding: 0 4px;
+  }
   .lang-toggle { border: 1px solid var(--line); background: #fff; padding: 7px 14px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit; }
+
   .page-inner { max-width: 1140px; margin: 0 auto; padding: 32px 20px 60px; }
   .page-title { font-size: 24px; font-weight: 700; margin: 0 0 24px; }
+
   .filter-bar { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
   .search-box { flex: 1; min-width: 220px; }
   .search-box input { width: 100%; padding: 11px 16px; border: 1px solid var(--line); border-radius: var(--btn-radius); font-size: 14.5px; font-family: inherit; }
   .category-pills { display: flex; gap: 8px; flex-wrap: wrap; }
   .pill { border: 1px solid var(--line); background: #fff; padding: 8px 16px; border-radius: 20px; font-size: 13.5px; cursor: pointer; font-family: inherit; }
   .pill.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+
   .results-label { font-size: 13px; color: var(--ink-soft); margin-bottom: 18px; min-height: 16px; }
+
   .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px; }
   .product-card-wrap { display: flex; flex-direction: column; gap: 8px; }
   .product-img { width: 100%; height: 200px; border-radius: 10px; background-size: cover; background-position: center; background-color: var(--bg); }
@@ -37,8 +55,12 @@
   .product-stars { color: #d97706; font-size: 12.5px; margin-bottom: 4px; }
   .price-now { font-weight: 700; color: var(--ink); }
   .price-old { text-decoration: line-through; color: var(--ink-soft); font-size: 13px; margin-left: 6px; }
-  .quick-add { border: 1px solid var(--line); background: #fff; color: var(--primary-color); padding: 8px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit; }
+  .quick-add {
+    border: 1px solid var(--line); background: #fff; color: var(--primary-color);
+    padding: 8px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit;
+  }
   .quick-add:hover { background: var(--bg); }
+
   .site-footer { border-top: 1px solid var(--line); padding: 28px 20px; margin-top: 40px; }
   .footer-inner { max-width: 1140px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13.5px; color: var(--ink-soft); }
   .footer-links { display: flex; gap: 18px; }
@@ -46,6 +68,7 @@
 </head>
 <body>
 
+  <!-- ===== সম্পূর্ণ HTML স্ট্রাকচার ===== -->
   <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="brand">
@@ -75,11 +98,10 @@
     </div>
     <div class="category-pills" id="categoryPills">
       <button type="button" class="pill active" data-slug="" id="allPill">সব</button>
-      <!-- বাকি পিল JS দিয়ে যোগ হবে -->
     </div>
     <div class="results-label" id="resultsLabel"></div>
     <div class="product-grid" id="productGrid">
-      <!-- প্রোডাক্ট JS দিয়ে যোগ হবে -->
+      <p class="muted" id="productEmpty" style="display:none;"></p>
     </div>
   </main>
 
@@ -94,52 +116,29 @@
     </div>
   </footer>
 
+  <!-- ===== ইনলাইন JS (ল্যাঙ্গুয়েজ + সার্চ/ফিল্টার) ===== -->
   <script>
-    // =============================================
-    // 🔥 স্ট্যাটিক পেজের জন্য ল্যাঙ্গুয়েজ টগল + সার্চ/ফিল্টার
-    // =============================================
-
-    // ----- ১. ট্রান্সলেশন -----
+    // ----- ট্রান্সলেশন -----
     const translations = {
       bn: {
-        home: "হোম",
-        shop: "শপ",
-        cart: "কার্ট",
-        login: "লগইন",
-        shop_title: "শপ",
-        search_placeholder: "প্রোডাক্ট খুঁজুন...",
-        all: "সব",
-        no_products: "কোনো প্রোডাক্ট পাওয়া যায়নি।",
-        add_to_cart: "কার্টে যুক্ত করুন",
-        added: "যুক্ত হয়েছে ✓"
+        home: "হোম", shop: "শপ", cart: "কার্ট", login: "লগইন",
+        shop_title: "শপ", search_placeholder: "প্রোডাক্ট খুঁজুন...",
+        all: "সব", no_products: "কোনো প্রোডাক্ট পাওয়া যায়নি।",
+        add_to_cart: "কার্টে যুক্ত করুন", added: "যুক্ত হয়েছে ✓"
       },
       en: {
-        home: "Home",
-        shop: "Shop",
-        cart: "Cart",
-        login: "Login",
-        shop_title: "Shop",
-        search_placeholder: "Search products...",
-        all: "All",
-        no_products: "No products found.",
-        add_to_cart: "Add to Cart",
-        added: "Added ✓"
+        home: "Home", shop: "Shop", cart: "Cart", login: "Login",
+        shop_title: "Shop", search_placeholder: "Search products...",
+        all: "All", no_products: "No products found.",
+        add_to_cart: "Add to Cart", added: "Added ✓"
       }
     };
-
-    function getLang() {
-      return localStorage.getItem('siteLang') || 'bn';
-    }
-
-    function setLang(lang) {
-      localStorage.setItem('siteLang', lang);
-    }
-
+    function getLang() { return localStorage.getItem('siteLang') || 'bn'; }
+    function setLang(l) { localStorage.setItem('siteLang', l); }
     function t(key) {
       const lang = getLang();
       return (translations[lang] && translations[lang][key]) || translations.bn[key] || key;
     }
-
     function applyTranslations() {
       const lang = getLang();
       document.getElementById('navHome').textContent = t('home');
@@ -151,18 +150,16 @@
       document.getElementById('allPill').textContent = t('all');
       document.getElementById('langToggle').textContent = lang === 'bn' ? 'English' : 'বাংলা';
     }
-
     document.getElementById('langToggle').addEventListener('click', function() {
-      const currentLang = getLang();
-      const newLang = currentLang === 'bn' ? 'en' : 'bn';
+      const newLang = getLang() === 'bn' ? 'en' : 'bn';
       setLang(newLang);
       applyTranslations();
-      // সার্চ/ফিল্টার রি-রেন্ডার
-      applyFilters();
+      // রি-রেন্ডার ফিল্টার (যদি ডেটা লোড করা থাকে)
+      if (typeof applyFilters === 'function') applyFilters();
       updateCartBadge();
     });
 
-    // ----- ২. কার্ট ব্যাজ -----
+    // ----- কার্ট ব্যাজ -----
     function updateCartBadge() {
       const badge = document.getElementById('cartBadge');
       if (!badge) return;
@@ -174,18 +171,122 @@
       } catch(e) {}
     }
 
-    // ----- ৩. সার্চ ও ফিল্টার (আপনার আগের JS থেকে নেওয়া) -----
-    const allProducts = [ /* আপনার প্রোডাক্ট ডেটা এখানে */ ];
+    // ----- সার্চ/ফিল্টার (বিল্ড স্ক্রিপ্ট ডেটা ইনজেক্ট করবে) -----
+    // ধরে নিচ্ছি allProducts এবং categories ডেটা এখানে ইনজেক্ট হবে
+    // এখানে শুধু ফাংশন সংরক্ষণ করা হচ্ছে
+    let allProducts = [];
+    let fuse = null;
+    let selectedCategory = new URLSearchParams(location.search).get('category') || '';
+    let categoriesMap = {};
 
-    // (এখানে আপনার পুরানো shop.html-এর JS বসবে – শুধু translations-এ t() ব্যবহার করুন)
+    function renderProducts(results) {
+      const grid = document.getElementById('productGrid');
+      const empty = document.getElementById('productEmpty');
+      if (results.length === 0) {
+        grid.innerHTML = '';
+        empty.textContent = t('no_products');
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      const lang = getLang();
+      grid.innerHTML = results.map(p => {
+        const name = lang === 'bn' ? (p.name_bn || p.name_en) : (p.name_en || p.name_bn);
+        const img = (p.images && p.images[0]) || '';
+        const price = p.discountPrice
+          ? `<span class="price-now">৳${p.discountPrice}</span> <span class="price-old">৳${p.basePrice}</span>`
+          : `<span class="price-now">৳${p.basePrice}</span>`;
+        const stars = p.avgRating ? '★'.repeat(Math.round(p.avgRating)) : '';
+        const addBtn = !p.hasVariants
+          ? `<button type="button" class="quick-add" data-id="${p.id}">${t('add_to_cart')}</button>`
+          : '';
+        return `<div class="product-card-wrap">
+          <a href="product/${p.id}.html" class="product-card">
+            <div class="product-img" style="background-image:url('${img}')"></div>
+            <div class="product-info">
+              <div class="product-name">${name}</div>
+              ${stars ? `<div class="product-stars">${stars}</div>` : ''}
+              <div class="product-price">${price}</div>
+            </div>
+          </a>
+          ${addBtn}
+        </div>`;
+      }).join('');
 
-    // ----- ৪. পেজ লোড হলে -----
+      // Quick-add ইভেন্ট
+      document.querySelectorAll('.quick-add').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const product = allProducts.find(p => p.id === this.dataset.id);
+          if (!product) return;
+          const name = getLang() === 'bn' ? (product.name_bn || product.name_en) : (product.name_en || product.name_bn);
+          const cart = JSON.parse(localStorage.getItem('localCart') || '[]');
+          const existing = cart.find(i => i.productId === product.id && i.variantCode === product.id);
+          if (existing) existing.qty += 1;
+          else cart.push({ productId: product.id, variantCode: product.id, variantName: '', name, price: product.discountPrice || product.basePrice, image: (product.images && product.images[0]) || '', qty: 1 });
+          localStorage.setItem('localCart', JSON.stringify(cart));
+          updateCartBadge();
+          this.textContent = t('added');
+          setTimeout(() => { this.textContent = t('add_to_cart'); }, 1500);
+        });
+      });
+    }
+
+    function applyFilters() {
+      const searchTerm = document.getElementById('searchInput').value.trim();
+      let results = allProducts;
+      if (searchTerm) results = fuse.search(searchTerm).map(r => r.item);
+      if (selectedCategory) results = results.filter(p => p.category === selectedCategory);
+
+      const label = document.getElementById('resultsLabel');
+      const parts = [];
+      if (selectedCategory && categoriesMap[selectedCategory]) parts.push(categoriesMap[selectedCategory]);
+      if (searchTerm) parts.push((getLang() === 'bn' ? 'সার্চ: ' : 'Search: ') + searchTerm);
+      label.textContent = parts.length ? parts.join(' · ') + ' (' + results.length + ')' : '';
+      renderProducts(results);
+    }
+
+    // এই ফাংশনগুলো build script থেকে ইনজেক্ট করা ডেটা দিয়ে কল হবে
+    function initShop(products, categories) {
+      allProducts = products;
+      fuse = new Fuse(allProducts, {
+        keys: ['name_bn', 'name_en', 'tags'],
+        threshold: 0.4,
+        ignoreLocation: true
+      });
+      // ক্যাটাগরি পিল তৈরি
+      const wrap = document.getElementById('categoryPills');
+      const lang = getLang();
+      let html = `<button type="button" class="pill ${selectedCategory === '' ? 'active' : ''}" data-slug="">${t('all')}</button>`;
+      categories.forEach(c => {
+        const name = lang === 'bn' ? (c.name_bn || c.name_en) : (c.name_en || c.name_bn);
+        categoriesMap[c.slug] = name;
+        html += `<button type="button" class="pill ${selectedCategory === c.slug ? 'active' : ''}" data-slug="${c.slug}">${name}</button>`;
+      });
+      wrap.innerHTML = html;
+      wrap.querySelectorAll('.pill').forEach(btn => {
+        btn.addEventListener('click', function() {
+          wrap.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          selectedCategory = this.dataset.slug;
+          applyFilters();
+        });
+      });
+      document.getElementById('searchInput').addEventListener('input', applyFilters);
+      applyFilters();
+    }
+
+    // ----- পেজ লোড হলে -----
     document.addEventListener('DOMContentLoaded', function() {
       applyTranslations();
       updateCartBadge();
       document.getElementById('footerYear').textContent = new Date().getFullYear();
-      // আপনার ফিল্টার/সার্চ ফাংশন কল করুন
-      // loadProducts(); // ইত্যাদি
+      // ধরে নিচ্ছি build script এই ডেটা ইনজেক্ট করবে
+      // যদি ডেটা আগে থেকেই থাকে (window.__INITIAL_DATA__), তাহলে initShop কল করবে
+      if (window.__INITIAL_DATA__) {
+        const { products, categories } = window.__INITIAL_DATA__;
+        initShop(products, categories);
+      }
     });
   </script>
 </body>
