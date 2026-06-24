@@ -3,17 +3,17 @@
 
 
 ## Pages
-- Shop: https://e1websitesell.github.io/final//shop.html
-- About: https://e1websitesell.github.io/final//about.html
-- Contact: https://e1websitesell.github.io/final//contact.html
+- Shop: https://e1websitesell.github.io/final/shop.html
+- About: https://e1websitesell.github.io/final/about.html
+- Contact: https://e1websitesell.github.io/final/contact.html
 
 ## Categories
-- fashion: https://e1websitesell.github.io/final//shop.html?category=fashion
-- instruments: https://e1websitesell.github.io/final//shop.html?category=instruments
-- audio: https://e1websitesell.github.io/final//shop.html?category=audio
-- home: https://e1websitesell.github.io/final//shop.html?category=home
-- gadgets: https://e1websitesell.github.io/final//shop.html?category=gadgets
-- electronics: https://e1websitesell.github.io/final//shop.html?category=electronics
+- fashion: https://e1websitesell.github.io/final/shop.html?category=fashion
+- instruments: https://e1websitesell.github.io/final/shop.html?category=instruments
+- audio: https://e1websitesell.github.io/final/shop.html?category=audio
+- home: https://e1websitesell.github.io/final/shop.html?category=home
+- gadgets: https://e1websitesell.github.io/final/shop.html?category=gadgets
+- electronics: https://e1websitesell.github.io/final/shop.html?category=electronics
 
 ## Products
 13 products available. See sitemap.xml for the full list.
