@@ -2,7 +2,7 @@
 // (product/{id}.html), আর sitemap.xml + llms.txt আপডেট করে।
 // GitHub Action থেকে অটোমেটিক চলে।
 // ⚡ index1.html টেমপ্লেট পড়ে index.html তৈরি করে (স্ট্যাটিক)
-// ⚡ shop.html ডায়নামিক থাকবে (জেনারেট করা হয় না)
+// ⚡ ল্যাঙ্গুয়েজ টগল data-i18n অ্যাট্রিবিউট দিয়ে কাজ করে
 
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs, doc, getDoc } from "firebase/firestore";
@@ -13,14 +13,11 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
-
-// ডোমেইন কেনার পর এটা বদলে দিন
-const SITE_URL = "https://e1websitesell.github.io/final"; // শেষে "/" নেই
+const SITE_URL = "https://e1websitesell.github.io/final";
 
 const firebaseConfig = JSON.parse(
   await fs.readFile(path.join(__dirname, "firebase-config.json"), "utf-8")
 );
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -57,7 +54,7 @@ async function fetchCategories() {
 }
 
 // ============================================================
-// ১. প্রোডাক্ট পেজ (cheerio দিয়ে, আগের মতো)
+// ১. প্রোডাক্ট পেজ (cheerio দিয়ে)
 // ============================================================
 const ROOT_PAGES = [
   "index.html", "shop.html", "cart.html", "login.html", "account.html",
@@ -75,7 +72,6 @@ function fixTemplateDepth(html) {
 
 function buildProductPage(fixedTemplate, product, shopName) {
   const $ = cheerio.load(fixedTemplate);
-
   const name = product.name_en || product.name_bn || "Product";
   const desc = (product.description_en || product.description_bn || "").slice(0, 160);
   const image = (product.images && product.images[0]) || "";
@@ -127,12 +123,11 @@ function buildProductPage(fixedTemplate, product, shopName) {
     $("#thumbStrip").html(thumbHtml);
   }
   $("#tagsRow").text((product.tags || []).join(" · "));
-
   return $.html();
 }
 
 // ============================================================
-// ২. ইনডেক্স পেজ – index1.html টেমপ্লেট পড়ে index.html বানায়
+// ২. ইনডেক্স পেজ – index1.html টেমপ্লেট থেকে (data-i18n সাপোর্ট)
 // ============================================================
 async function buildIndexPageFromTemplate(settings, categories, products) {
   const templatePath = path.join(ROOT, "index1.html");
@@ -182,15 +177,10 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
       return `<a href="shop.html?category=${encodeURIComponent(c.slug)}" class="category-card" style="background-image:url('${escapeHtml(imgUrl)}')"><span>${escapeHtml(name)}</span></a>`;
     }).join("");
     categoryGrid.html(catHTML);
-    // Cheerio-তে .hide() নেই, তাই .remove() অথবা css('display','none')
-    if (categoryEmpty.length) {
-      categoryEmpty.css('display', 'none');
-    }
+    if (categoryEmpty.length) categoryEmpty.css('display', 'none');
   } else {
     categoryGrid.html('<p class="muted">কোনো ক্যাটাগরি নেই</p>');
-    if (categoryEmpty.length) {
-      categoryEmpty.css('display', 'none');
-    }
+    if (categoryEmpty.length) categoryEmpty.css('display', 'none');
   }
 
   // ----- ৬. ফিচার্ড প্রোডাক্ট -----
@@ -215,21 +205,18 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
       </a>`;
     }).join("");
     productGrid.html(prodHTML);
-    if (productEmpty.length) {
-      productEmpty.css('display', 'none');
-    }
+    if (productEmpty.length) productEmpty.css('display', 'none');
   } else {
     productGrid.html('<p class="muted">কোনো প্রোডাক্ট নেই</p>');
-    if (productEmpty.length) {
-      productEmpty.css('display', 'none');
-    }
+    if (productEmpty.length) productEmpty.css('display', 'none');
   }
 
-  // ----- ৭. ল্যাঙ্গুয়েজ টগলের জন্য স্ট্যাটিক JS -----
+  // ----- ৭. ডায়নামিক স্ক্রিপ্ট সরিয়ে স্ট্যাটিক ট্রান্সলেশন স্ক্রিপ্ট বসান -----
+  // data-i18n অ্যাট্রিবিউট ভিত্তিক ট্রান্সলেশন
   const staticScript = `
   <script>
     // =========================================================
-    // 🔥 স্ট্যাটিক ইনডেক্স – ল্যাঙ্গুয়েজ টগল (রিলোড ছাড়া)
+    // 🔥 স্ট্যাটিক ইনডেক্স – data-i18n দিয়ে ল্যাঙ্গুয়েজ টগল
     // =========================================================
     const translations = {
       bn: {
@@ -239,7 +226,8 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
         login: "লগইন",
         shop_now: "শপ করুন",
         categories: "ক্যাটাগরি",
-        featured: "ফিচার্ড প্রোডাক্ট"
+        featured_products: "ফিচার্ড প্রোডাক্ট",
+        search_placeholder: "প্রোডাক্ট খুঁজুন..."
       },
       en: {
         home: "Home",
@@ -248,7 +236,8 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
         login: "Login",
         shop_now: "Shop Now",
         categories: "Categories",
-        featured: "Featured Products"
+        featured_products: "Featured Products",
+        search_placeholder: "Search products..."
       }
     };
 
@@ -263,17 +252,28 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
     function applyTranslations() {
       const lang = getLang();
       const t = translations[lang] || translations.bn;
-      document.getElementById('navHome').textContent = t.home;
-      document.getElementById('navShop').textContent = t.shop;
-      document.getElementById('navCart').textContent = t.cart;
-      document.getElementById('navLogin').textContent = t.login;
-      document.getElementById('ctaBtn').textContent = t.shop_now;
-      document.getElementById('categoriesTitle').textContent = t.categories;
-      document.getElementById('featuredTitle').textContent = t.featured;
-      document.getElementById('langToggle').textContent = lang === 'bn' ? 'English' : 'বাংলা';
+      // data-i18n অ্যাট্রিবিউটযুক্ত সব এলিমেন্ট আপডেট করি
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) {
+          el.textContent = t[key];
+        }
+      });
+      // data-i18n-placeholder অ্যাট্রিবিউটযুক্ত ইনপুট আপডেট
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (t[key] !== undefined) {
+          el.placeholder = t[key];
+        }
+      });
+      // টগল বাটনের টেক্সট আপডেট
+      const toggleBtn = document.getElementById('langToggle');
+      if (toggleBtn) {
+        toggleBtn.textContent = lang === 'bn' ? 'English' : 'বাংলা';
+      }
     }
 
-    document.getElementById('langToggle').addEventListener('click', function() {
+    document.getElementById('langToggle')?.addEventListener('click', function() {
       const newLang = getLang() === 'bn' ? 'en' : 'bn';
       setLang(newLang);
       applyTranslations();
@@ -310,6 +310,7 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
 // ফ্যালব্যাক: index1.html না থাকলে ডিফল্ট ইনডেক্স তৈরি
 // ============================================================
 function buildFallbackIndex(settings, categories, products) {
+  // (এখানে সংক্ষিপ্ত ডিফল্ট HTML – আগের মতো)
   const shopName = settings.shopName_en || settings.shopName_bn || "Shop";
   const heroText = settings.heroText_en || settings.heroText_bn || "";
   const bannerImages = settings.bannerImages || [];
@@ -391,13 +392,13 @@ function buildFallbackIndex(settings, categories, products) {
         <span id="shopNameText">${escapeHtml(shopName)}</span>
       </a>
       <nav class="main-nav">
-        <a href="index.html" id="navHome">হোম</a>
-        <a href="shop.html" id="navShop">শপ</a>
+        <a href="index.html" data-i18n="home">হোম</a>
+        <a href="shop.html" data-i18n="shop">শপ</a>
         <a href="cart.html" class="cart-link">
-          <span id="navCart">কার্ট</span>
+          <span data-i18n="cart">কার্ট</span>
           <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
         </a>
-        <a href="login.html" id="navLogin">লগইন</a>
+        <a href="login.html" data-i18n="login">লগইন</a>
       </nav>
       <button id="langToggle" class="lang-toggle">English</button>
     </div>
@@ -407,17 +408,17 @@ function buildFallbackIndex(settings, categories, products) {
     <div class="hero-slides">${bannerHTML}</div>
     <div class="hero-overlay">
       <h1 id="heroTitle">${escapeHtml(heroText)}</h1>
-      <a href="shop.html" class="cta-btn" id="ctaBtn">শপ করুন</a>
+      <a href="shop.html" class="cta-btn" data-i18n="shop_now">শপ করুন</a>
     </div>
   </section>
 
   <section class="section">
-    <h2 id="categoriesTitle">ক্যাটাগরি</h2>
+    <h2 data-i18n="categories">ক্যাটাগরি</h2>
     <div class="category-grid">${categoryHTML || '<p class="muted">কোনো ক্যাটাগরি নেই</p>'}</div>
   </section>
 
   <section class="section">
-    <h2 id="featuredTitle">ফিচার্ড প্রোডাক্ট</h2>
+    <h2 data-i18n="featured_products">ফিচার্ড প্রোডাক্ট</h2>
     <div class="product-grid">${productHTML || '<p class="muted">কোনো প্রোডাক্ট নেই</p>'}</div>
   </section>
 
@@ -434,7 +435,7 @@ function buildFallbackIndex(settings, categories, products) {
 
   <script>
     // =========================================================
-    // 🔥 ট্রান্সলেশন (বাংলা/ইংরেজি) – রিলোড ছাড়াই কাজ করবে
+    // 🔥 স্ট্যাটিক ইনডেক্স – data-i18n দিয়ে ল্যাঙ্গুয়েজ টগল
     // =========================================================
     const translations = {
       bn: {
@@ -444,7 +445,7 @@ function buildFallbackIndex(settings, categories, products) {
         login: "লগইন",
         shop_now: "শপ করুন",
         categories: "ক্যাটাগরি",
-        featured: "ফিচার্ড প্রোডাক্ট"
+        featured_products: "ফিচার্ড প্রোডাক্ট"
       },
       en: {
         home: "Home",
@@ -453,7 +454,7 @@ function buildFallbackIndex(settings, categories, products) {
         login: "Login",
         shop_now: "Shop Now",
         categories: "Categories",
-        featured: "Featured Products"
+        featured_products: "Featured Products"
       }
     };
 
@@ -468,17 +469,19 @@ function buildFallbackIndex(settings, categories, products) {
     function applyTranslations() {
       const lang = getLang();
       const t = translations[lang] || translations.bn;
-      document.getElementById('navHome').textContent = t.home;
-      document.getElementById('navShop').textContent = t.shop;
-      document.getElementById('navCart').textContent = t.cart;
-      document.getElementById('navLogin').textContent = t.login;
-      document.getElementById('ctaBtn').textContent = t.shop_now;
-      document.getElementById('categoriesTitle').textContent = t.categories;
-      document.getElementById('featuredTitle').textContent = t.featured;
-      document.getElementById('langToggle').textContent = lang === 'bn' ? 'English' : 'বাংলা';
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) {
+          el.textContent = t[key];
+        }
+      });
+      const toggleBtn = document.getElementById('langToggle');
+      if (toggleBtn) {
+        toggleBtn.textContent = lang === 'bn' ? 'English' : 'বাংলা';
+      }
     }
 
-    document.getElementById('langToggle').addEventListener('click', function() {
+    document.getElementById('langToggle')?.addEventListener('click', function() {
       const newLang = getLang() === 'bn' ? 'en' : 'bn';
       setLang(newLang);
       applyTranslations();
@@ -554,10 +557,8 @@ async function main() {
   // --- ১. প্রোডাক্ট পেজ ---
   const productDir = path.join(ROOT, "product");
   await fs.mkdir(productDir, { recursive: true });
-
   const rawTemplate = await fs.readFile(path.join(ROOT, "product.html"), "utf-8");
   const fixedTemplate = fixTemplateDepth(rawTemplate);
-
   for (const product of products) {
     const html = buildProductPage(fixedTemplate, product, shopName);
     await fs.writeFile(path.join(productDir, `${product.id}.html`), html, "utf-8");
@@ -567,7 +568,7 @@ async function main() {
   // --- ২. ইনডেক্স পেজ (index1.html থেকে) ---
   const indexHTML = await buildIndexPageFromTemplate(settings, categories, products);
   await fs.writeFile(path.join(ROOT, "index.html"), indexHTML, "utf-8");
-  console.log("✅ index.html (স্ট্যাটিক) তৈরি হয়েছে – index1.html টেমপ্লেট থেকে");
+  console.log("✅ index.html (স্ট্যাটিক) তৈরি হয়েছে – data-i18n ভিত্তিক ল্যাঙ্গুয়েজ টগল সহ");
 
   // --- ৩. shop.html ডায়নামিক থাকবে ---
   console.log("⏩ shop.html ডায়নামিক ভার্সনেই থাকবে (জেনারেট করা হয়নি)");
@@ -582,6 +583,7 @@ async function main() {
 
   console.log("🎉 সব পেজ তৈরি সম্পন্ন!");
   console.log("📌 index1.html (ডায়নামিক) → index.html (স্ট্যাটিক) তৈরি হয়েছে!");
+  console.log("📌 ল্যাঙ্গুয়েজ টগল এখন data-i18n অ্যাট্রিবিউট দিয়ে কাজ করবে।");
 }
 
 main().catch((err) => {
