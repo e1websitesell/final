@@ -6,34 +6,65 @@
 <title>Shop</title>
 <meta name="description" content="">
 <style>
-  /* ====== আপনার আগের CSS (অপরিবর্তিত) ====== */
-  :root { --primary-color: #1a1d29; --accent-color: #6b7280; --site-font: system-ui, sans-serif; --btn-radius: 8px; --ink: #1a1d29; --ink-soft: #6b7280; --line: #e5e7eb; --bg: #f7f7f9; }
+  /* ===== আপনার আসল CSS ===== */
+  :root {
+    --primary-color: #1a1d29;
+    --accent-color: #6b7280;
+    --site-font: system-ui, sans-serif;
+    --btn-radius: 8px;
+    --ink: #1a1d29;
+    --ink-soft: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f7f7f9;
+  }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--site-font); color: var(--ink); background: #fff; }
   a { text-decoration: none; color: inherit; }
   .muted { color: var(--ink-soft); font-size: 14px; }
+
   .site-header { border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 10; }
   .header-inner { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
   .brand { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; }
   .brand img { height: 34px; width: auto; }
   .main-nav { display: flex; align-items: center; gap: 26px; font-size: 14.5px; font-weight: 500; }
   .cart-link { position: relative; }
-  .cart-badge { position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
-  .lang-toggle { border: 1px solid var(--line); background: #fff; padding: 7px 14px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit; }
+  .cart-badge {
+    position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff;
+    font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; padding: 0 4px;
+  }
+  .lang-toggle {
+    border: 1px solid var(--line); background: #fff; padding: 7px 14px;
+    border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+
   .hero { position: relative; height: 420px; overflow: hidden; color: #fff; background: var(--primary-color); }
   .hero-slides { position: absolute; inset: 0; }
   .hero-slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.2s ease; }
   .hero-slide.active { opacity: 1; }
   .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.55)); }
-  .hero-overlay { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 24px; }
+  .hero-overlay {
+    position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; padding: 0 24px;
+  }
   .hero-overlay h1 { font-size: 34px; margin: 0 0 22px; max-width: 600px; font-weight: 700; }
-  .cta-btn { background: var(--accent-color); color: #fff; padding: 13px 30px; border-radius: var(--btn-radius); font-size: 15px; font-weight: 600; }
+  .cta-btn {
+    background: var(--accent-color); color: #fff; padding: 13px 30px;
+    border-radius: var(--btn-radius); font-size: 15px; font-weight: 600;
+  }
+
   .section { max-width: 1140px; margin: 0 auto; padding: 50px 20px; }
   .section h2 { font-size: 22px; margin: 0 0 22px; font-weight: 700; }
+
   .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
-  .category-card { height: 120px; border-radius: 12px; background-size: cover; background-position: center; background-color: var(--bg); display: flex; align-items: flex-end; padding: 14px; color: #fff; font-weight: 600; font-size: 15px; position: relative; overflow: hidden; }
+  .category-card {
+    height: 120px; border-radius: 12px; background-size: cover; background-position: center;
+    background-color: var(--bg); display: flex; align-items: flex-end; padding: 14px;
+    color: #fff; font-weight: 600; font-size: 15px; position: relative; overflow: hidden;
+  }
   .category-card::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.25); }
   .category-card span { position: relative; z-index: 1; }
+
   .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px; }
   .product-card { display: block; }
   .product-img { width: 100%; height: 200px; border-radius: 10px; background-size: cover; background-position: center; background-color: var(--bg); }
@@ -42,6 +73,7 @@
   .product-stars { color: #d97706; font-size: 12.5px; margin-bottom: 4px; }
   .price-now { font-weight: 700; color: var(--ink); }
   .price-old { text-decoration: line-through; color: var(--ink-soft); font-size: 13px; margin-left: 6px; }
+
   .site-footer { border-top: 1px solid var(--line); padding: 28px 20px; margin-top: 40px; }
   .footer-inner { max-width: 1140px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13.5px; color: var(--ink-soft); }
   .footer-links { display: flex; gap: 18px; }
@@ -49,7 +81,7 @@
 </head>
 <body>
 
-  <!-- আপনার পুরানো HTML স্ট্রাকচার (অপরিবর্তিত) -->
+  <!-- ===== সম্পূর্ণ HTML স্ট্রাকচার (আপনার আগের মতো) ===== -->
   <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="brand">
@@ -102,71 +134,41 @@
     </div>
   </footer>
 
+  <!-- ===== ইনলাইন JS (ল্যাঙ্গুয়েজ + কার্ট) ===== -->
   <script>
-    // =============================================
-    // 🔥 স্ট্যাটিক পেজের জন্য ল্যাঙ্গুয়েজ টগল (ভ্যানিলা JS)
-    // =============================================
-
-    // ১. ট্রান্সলেশন অবজেক্ট
+    // ----- ট্রান্সলেশন -----
     const translations = {
       bn: {
-        home: "হোম",
-        shop: "শপ",
-        cart: "কার্ট",
-        login: "লগইন",
-        shop_now: "শপ করুন",
-        categories: "ক্যাটাগরি",
-        featured_products: "ফিচার্ড প্রোডাক্ট"
+        home: "হোম", shop: "শপ", cart: "কার্ট", login: "লগইন",
+        shop_now: "শপ করুন", categories: "ক্যাটাগরি", featured: "ফিচার্ড প্রোডাক্ট"
       },
       en: {
-        home: "Home",
-        shop: "Shop",
-        cart: "Cart",
-        login: "Login",
-        shop_now: "Shop Now",
-        categories: "Categories",
-        featured_products: "Featured Products"
+        home: "Home", shop: "Shop", cart: "Cart", login: "Login",
+        shop_now: "Shop Now", categories: "Categories", featured: "Featured Products"
       }
     };
-
-    // ২. বর্তমান ভাষা পান
-    function getLang() {
-      return localStorage.getItem('siteLang') || 'bn';
-    }
-
-    // ৩. ভাষা সেট করুন
-    function setLang(lang) {
-      localStorage.setItem('siteLang', lang);
-    }
-
-    // ৪. পেজের টেক্সট আপডেট করুন
+    function getLang() { return localStorage.getItem('siteLang') || 'bn'; }
+    function setLang(l) { localStorage.setItem('siteLang', l); }
     function applyTranslations() {
       const lang = getLang();
       const t = translations[lang] || translations.bn;
-
       document.getElementById('navHome').textContent = t.home;
       document.getElementById('navShop').textContent = t.shop;
       document.getElementById('navCart').textContent = t.cart;
       document.getElementById('navLogin').textContent = t.login;
       document.getElementById('ctaBtn').textContent = t.shop_now;
       document.getElementById('categoriesTitle').textContent = t.categories;
-      document.getElementById('featuredTitle').textContent = t.featured_products;
-
-      // ভাষা টগল বাটনের টেক্সট পরিবর্তন
+      document.getElementById('featuredTitle').textContent = t.featured;
       document.getElementById('langToggle').textContent = lang === 'bn' ? 'English' : 'বাংলা';
     }
-
-    // ৫. ইভেন্ট লিসেনার
     document.getElementById('langToggle').addEventListener('click', function() {
-      const currentLang = getLang();
-      const newLang = currentLang === 'bn' ? 'en' : 'bn';
+      const newLang = getLang() === 'bn' ? 'en' : 'bn';
       setLang(newLang);
       applyTranslations();
-      // কার্ট ব্যাজ রি-আপডেট
       updateCartBadge();
     });
 
-    // ৬. কার্ট ব্যাজ (localStorage থেকে)
+    // ----- কার্ট ব্যাজ -----
     function updateCartBadge() {
       const badge = document.getElementById('cartBadge');
       if (!badge) return;
@@ -178,11 +180,13 @@
       } catch(e) {}
     }
 
-    // ৭. পেজ লোড হলে ট্রান্সলেশন ও ব্যাজ আপডেট
+    // ----- পেজ লোড হলে -----
     document.addEventListener('DOMContentLoaded', function() {
       applyTranslations();
       updateCartBadge();
       document.getElementById('footerYear').textContent = new Date().getFullYear();
+      // এখানে আপনার ক্যাটাগরি ও প্রোডাক্ট ডেটা ইনজেক্ট করার ফাংশন কল করবেন (স্ট্যাটিক ডেটা)
+      // যেমন: loadCategories(), loadProducts() – যেগুলো build script থেকে ইনজেক্ট হবে
     });
   </script>
 </body>
