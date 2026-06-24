@@ -135,20 +135,18 @@ function buildProductPage(fixedTemplate, product, shopName) {
 // ২. ইনডেক্স পেজ – index1.html টেমপ্লেট পড়ে index.html বানায়
 // ============================================================
 async function buildIndexPageFromTemplate(settings, categories, products) {
-  // index1.html ফাইল রিড করি
   const templatePath = path.join(ROOT, "index1.html");
   let template;
   try {
     template = await fs.readFile(templatePath, "utf-8");
   } catch (e) {
     console.error("⚠️ index1.html পাওয়া যায়নি। ডিফল্ট টেমপ্লেট ব্যবহার করা হচ্ছে।");
-    // ফ্যালব্যাক: ডিফল্ট ইনডেক্স তৈরি করি
     return buildFallbackIndex(settings, categories, products);
   }
 
   const $ = cheerio.load(template);
 
-  // ----- ১. মেটা ডেটা আপডেট -----
+  // ----- ১. মেটা ডেটা -----
   const shopName = settings.shopName_en || settings.shopName_bn || "Shop";
   $("title").text(shopName);
   $('meta[name="description"]').attr("content", settings.heroText_en || settings.heroText_bn || "");
@@ -175,6 +173,7 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
 
   // ----- ৫. ক্যাটাগরি গ্রিড -----
   const categoryGrid = $("#categoryGrid");
+  const categoryEmpty = $("#categoryEmpty");
   const defaultImage = 'https://via.placeholder.com/400x200?text=No+Image';
   if (categories.length > 0) {
     const catHTML = categories.map(c => {
@@ -183,13 +182,20 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
       return `<a href="shop.html?category=${encodeURIComponent(c.slug)}" class="category-card" style="background-image:url('${escapeHtml(imgUrl)}')"><span>${escapeHtml(name)}</span></a>`;
     }).join("");
     categoryGrid.html(catHTML);
-    $("#categoryEmpty").hide();
+    // Cheerio-তে .hide() নেই, তাই .remove() অথবা css('display','none')
+    if (categoryEmpty.length) {
+      categoryEmpty.css('display', 'none');
+    }
   } else {
     categoryGrid.html('<p class="muted">কোনো ক্যাটাগরি নেই</p>');
+    if (categoryEmpty.length) {
+      categoryEmpty.css('display', 'none');
+    }
   }
 
   // ----- ৬. ফিচার্ড প্রোডাক্ট -----
   const productGrid = $("#productGrid");
+  const productEmpty = $("#productEmpty");
   const featuredProducts = products.slice(0, 8);
   if (featuredProducts.length > 0) {
     const prodHTML = featuredProducts.map(p => {
@@ -209,12 +215,17 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
       </a>`;
     }).join("");
     productGrid.html(prodHTML);
+    if (productEmpty.length) {
+      productEmpty.css('display', 'none');
+    }
   } else {
     productGrid.html('<p class="muted">কোনো প্রোডাক্ট নেই</p>');
+    if (productEmpty.length) {
+      productEmpty.css('display', 'none');
+    }
   }
 
-  // ----- ৭. ল্যাঙ্গুয়েজ টগলের জন্য স্ট্যাটিক JS প্রতিস্থাপন -----
-  // আমরা <script type="module"> থেকে dynamic import সরিয়ে static JS বসাবো
+  // ----- ৭. ল্যাঙ্গুয়েজ টগলের জন্য স্ট্যাটিক JS -----
   const staticScript = `
   <script>
     // =========================================================
@@ -292,11 +303,6 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
   $('script[type="module"]').remove();
   $('body').append(staticScript);
 
-  // footerYear আপডেটের জন্য (যদি থাকে)
-  if ($("#footerYear").length) {
-    // static script এ ইতিমধ্যে হ্যান্ডেল করা আছে
-  }
-
   return $.html();
 }
 
@@ -304,8 +310,6 @@ async function buildIndexPageFromTemplate(settings, categories, products) {
 // ফ্যালব্যাক: index1.html না থাকলে ডিফল্ট ইনডেক্স তৈরি
 // ============================================================
 function buildFallbackIndex(settings, categories, products) {
-  // এই ফাংশনটি আমার আগের buildIndexPage() এর মতো
-  // কিন্তু সংক্ষিপ্ত রাখলাম – কারণ index1.html থাকলেই ভালো
   const shopName = settings.shopName_en || settings.shopName_bn || "Shop";
   const heroText = settings.heroText_en || settings.heroText_bn || "";
   const bannerImages = settings.bannerImages || [];
@@ -325,6 +329,10 @@ function buildFallbackIndex(settings, categories, products) {
     return `<a href="product/${p.id}.html" class="product-card"><div class="product-img" style="background-image:url('${escapeHtml(img)}')"></div><div class="product-info"><div class="product-name">${escapeHtml(name)}</div>${stars ? `<div class="product-stars">${stars}</div>` : ''}<div class="product-price">${price}</div></div></a>`;
   }).join('');
 
+  const bannerHTML = bannerImages.map((url, i) =>
+    `<div class="hero-slide ${i === 0 ? 'active' : ''}" style="background-image:url('${escapeHtml(url)}')"></div>`
+  ).join('');
+
   return `<!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -333,15 +341,167 @@ function buildFallbackIndex(settings, categories, products) {
 <title>${escapeHtml(shopName)}</title>
 <meta name="description" content="${escapeHtml(settings.heroText_en || settings.heroText_bn || '')}">
 <link rel="canonical" href="${SITE_URL}/">
-<style>/* CSS ... (সংক্ষিপ্ত) */</style>
+<style>
+  /* ====== আপনার index.html-এর সব CSS ====== */
+  :root { --primary-color: #1a1d29; --accent-color: #6b7280; --site-font: system-ui, sans-serif; --btn-radius: 8px; --ink: #1a1d29; --ink-soft: #6b7280; --line: #e5e7eb; --bg: #f7f7f9; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--site-font); color: var(--ink); background: #fff; }
+  a { text-decoration: none; color: inherit; }
+  .muted { color: var(--ink-soft); font-size: 14px; }
+  .site-header { border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 10; }
+  .header-inner { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; }
+  .brand img { height: 34px; width: auto; }
+  .main-nav { display: flex; align-items: center; gap: 26px; font-size: 14.5px; font-weight: 500; }
+  .cart-link { position: relative; }
+  .cart-badge { position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+  .lang-toggle { border: 1px solid var(--line); background: #fff; padding: 7px 14px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit; }
+  .hero { position: relative; height: 420px; overflow: hidden; color: #fff; background: var(--primary-color); }
+  .hero-slides { position: absolute; inset: 0; }
+  .hero-slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.2s ease; }
+  .hero-slide.active { opacity: 1; }
+  .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.55)); }
+  .hero-overlay { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 24px; }
+  .hero-overlay h1 { font-size: 34px; margin: 0 0 22px; max-width: 600px; font-weight: 700; }
+  .cta-btn { background: var(--accent-color); color: #fff; padding: 13px 30px; border-radius: var(--btn-radius); font-size: 15px; font-weight: 600; }
+  .section { max-width: 1140px; margin: 0 auto; padding: 50px 20px; }
+  .section h2 { font-size: 22px; margin: 0 0 22px; font-weight: 700; }
+  .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+  .category-card { height: 120px; border-radius: 12px; background-size: cover; background-position: center; background-color: var(--bg); display: flex; align-items: flex-end; padding: 14px; color: #fff; font-weight: 600; font-size: 15px; position: relative; overflow: hidden; }
+  .category-card::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.25); }
+  .category-card span { position: relative; z-index: 1; }
+  .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px; }
+  .product-card { display: block; }
+  .product-img { width: 100%; height: 200px; border-radius: 10px; background-size: cover; background-position: center; background-color: var(--bg); }
+  .product-info { padding-top: 10px; }
+  .product-name { font-size: 14.5px; font-weight: 600; margin-bottom: 4px; }
+  .product-stars { color: #d97706; font-size: 12.5px; margin-bottom: 4px; }
+  .price-now { font-weight: 700; color: var(--ink); }
+  .price-old { text-decoration: line-through; color: var(--ink-soft); font-size: 13px; margin-left: 6px; }
+  .site-footer { border-top: 1px solid var(--line); padding: 28px 20px; margin-top: 40px; }
+  .footer-inner { max-width: 1140px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13.5px; color: var(--ink-soft); }
+  .footer-links { display: flex; gap: 18px; }
+</style>
 </head>
 <body>
-  <header>...</header>
-  <section class="hero">...</section>
-  <section class="section"><h2>ক্যাটাগরি</h2><div class="category-grid">${categoryHTML}</div></section>
-  <section class="section"><h2>ফিচার্ড প্রোডাক্ট</h2><div class="product-grid">${productHTML}</div></section>
-  <footer>...</footer>
-  <script>/* ল্যাঙ্গুয়েজ টগল JS */</script>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        ${settings.logoUrl ? `<img src="${escapeHtml(settings.logoUrl)}" alt="" style="height:34px;">` : ''}
+        <span id="shopNameText">${escapeHtml(shopName)}</span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html" id="navHome">হোম</a>
+        <a href="shop.html" id="navShop">শপ</a>
+        <a href="cart.html" class="cart-link">
+          <span id="navCart">কার্ট</span>
+          <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
+        </a>
+        <a href="login.html" id="navLogin">লগইন</a>
+      </nav>
+      <button id="langToggle" class="lang-toggle">English</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-slides">${bannerHTML}</div>
+    <div class="hero-overlay">
+      <h1 id="heroTitle">${escapeHtml(heroText)}</h1>
+      <a href="shop.html" class="cta-btn" id="ctaBtn">শপ করুন</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 id="categoriesTitle">ক্যাটাগরি</h2>
+    <div class="category-grid">${categoryHTML || '<p class="muted">কোনো ক্যাটাগরি নেই</p>'}</div>
+  </section>
+
+  <section class="section">
+    <h2 id="featuredTitle">ফিচার্ড প্রোডাক্ট</h2>
+    <div class="product-grid">${productHTML || '<p class="muted">কোনো প্রোডাক্ট নেই</p>'}</div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span id="footerShopName">${escapeHtml(shopName)}</span> © <span id="footerYear"></span>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // =========================================================
+    // 🔥 ট্রান্সলেশন (বাংলা/ইংরেজি) – রিলোড ছাড়াই কাজ করবে
+    // =========================================================
+    const translations = {
+      bn: {
+        home: "হোম",
+        shop: "শপ",
+        cart: "কার্ট",
+        login: "লগইন",
+        shop_now: "শপ করুন",
+        categories: "ক্যাটাগরি",
+        featured: "ফিচার্ড প্রোডাক্ট"
+      },
+      en: {
+        home: "Home",
+        shop: "Shop",
+        cart: "Cart",
+        login: "Login",
+        shop_now: "Shop Now",
+        categories: "Categories",
+        featured: "Featured Products"
+      }
+    };
+
+    function getLang() {
+      return localStorage.getItem('siteLang') || 'bn';
+    }
+
+    function setLang(lang) {
+      localStorage.setItem('siteLang', lang);
+    }
+
+    function applyTranslations() {
+      const lang = getLang();
+      const t = translations[lang] || translations.bn;
+      document.getElementById('navHome').textContent = t.home;
+      document.getElementById('navShop').textContent = t.shop;
+      document.getElementById('navCart').textContent = t.cart;
+      document.getElementById('navLogin').textContent = t.login;
+      document.getElementById('ctaBtn').textContent = t.shop_now;
+      document.getElementById('categoriesTitle').textContent = t.categories;
+      document.getElementById('featuredTitle').textContent = t.featured;
+      document.getElementById('langToggle').textContent = lang === 'bn' ? 'English' : 'বাংলা';
+    }
+
+    document.getElementById('langToggle').addEventListener('click', function() {
+      const newLang = getLang() === 'bn' ? 'en' : 'bn';
+      setLang(newLang);
+      applyTranslations();
+      updateBadge();
+    });
+
+    function updateBadge() {
+      const badge = document.getElementById('cartBadge');
+      if (!badge) return;
+      try {
+        const cart = JSON.parse(localStorage.getItem('localCart') || '[]');
+        const count = cart.reduce((s, i) => s + (i.qty || 1), 0);
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+      } catch(e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      applyTranslations();
+      updateBadge();
+      document.getElementById('footerYear').textContent = new Date().getFullYear();
+    });
+  <\/script>
 </body>
 </html>`;
 }
