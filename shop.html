@@ -3,34 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>শপ — jibon</title>
-<meta name="description" content="সব প্রোডাক্ট এক জায়গায়">
-<link rel="canonical" href="https://e1websitesell.github.io/final/shop.html">
+<title>Shop</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js"></script>
 <style>
-  /* ====== আপনার shop.html-এর সব CSS ====== */
-  :root { --primary-color: #1a1d29; --accent-color: #6b7280; --site-font: system-ui, sans-serif; --btn-radius: 8px; --ink: #1a1d29; --ink-soft: #6b7280; --line: #e5e7eb; --bg: #f7f7f9; }
+  :root {
+    --primary-color: #1a1d29;
+    --accent-color: #6b7280;
+    --site-font: system-ui, sans-serif;
+    --btn-radius: 8px;
+    --ink: #1a1d29;
+    --ink-soft: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f7f7f9;
+  }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: var(--site-font); color: var(--ink); background: #fff; }
   a { text-decoration: none; color: inherit; }
   .muted { color: var(--ink-soft); font-size: 14px; }
+
   .site-header { border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 10; }
   .header-inner { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
   .brand { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; }
   .brand img { height: 34px; width: auto; }
   .main-nav { display: flex; align-items: center; gap: 26px; font-size: 14.5px; font-weight: 500; }
   .cart-link { position: relative; }
-  .cart-badge { position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+  .cart-badge {
+    position: absolute; top: -9px; right: -14px; background: var(--accent-color); color: #fff;
+    font-size: 11px; min-width: 18px; height: 18px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; padding: 0 4px;
+  }
   .lang-toggle { border: 1px solid var(--line); background: #fff; padding: 7px 14px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit; }
+
   .page-inner { max-width: 1140px; margin: 0 auto; padding: 32px 20px 60px; }
   .page-title { font-size: 24px; font-weight: 700; margin: 0 0 24px; }
+
   .filter-bar { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
   .search-box { flex: 1; min-width: 220px; }
   .search-box input { width: 100%; padding: 11px 16px; border: 1px solid var(--line); border-radius: var(--btn-radius); font-size: 14.5px; font-family: inherit; }
   .category-pills { display: flex; gap: 8px; flex-wrap: wrap; }
   .pill { border: 1px solid var(--line); background: #fff; padding: 8px 16px; border-radius: 20px; font-size: 13.5px; cursor: pointer; font-family: inherit; }
   .pill.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+
   .results-label { font-size: 13px; color: var(--ink-soft); margin-bottom: 18px; min-height: 16px; }
+
   .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px; }
   .product-card-wrap { display: flex; flex-direction: column; gap: 8px; }
   .product-img { width: 100%; height: 200px; border-radius: 10px; background-size: cover; background-position: center; background-color: var(--bg); }
@@ -39,183 +54,56 @@
   .product-stars { color: #d97706; font-size: 12.5px; margin-bottom: 4px; }
   .price-now { font-weight: 700; color: var(--ink); }
   .price-old { text-decoration: line-through; color: var(--ink-soft); font-size: 13px; margin-left: 6px; }
-  .quick-add { border: 1px solid var(--line); background: #fff; color: var(--primary-color); padding: 8px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit; }
+  .quick-add {
+    border: 1px solid var(--line); background: #fff; color: var(--primary-color);
+    padding: 8px; border-radius: var(--btn-radius); font-size: 13px; cursor: pointer; font-family: inherit;
+  }
   .quick-add:hover { background: var(--bg); }
+
   .site-footer { border-top: 1px solid var(--line); padding: 28px 20px; margin-top: 40px; }
   .footer-inner { max-width: 1140px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13.5px; color: var(--ink-soft); }
   .footer-links { display: flex; gap: 18px; }
 </style>
 </head>
 <body>
+
   <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="brand">
-        <img src="https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/683849488_1768462421202581_4155405898064180809_n.jpg?stp=dst-jpg_tt6&amp;cstp=mx835x828&amp;ctp=s835x828&amp;_nc_cat=108&amp;ccb=1-7&amp;_nc_sid=6ee11a&amp;_nc_eui2=AeGlZyKNKDvJFBiLWV9RN8ePXIgC9buciWNciAL1u5yJYyCS0ryylSIc5AflrBij2J3hdXw1kDRHpwukqBV6E-sI&amp;_nc_ohc=9sJqmYKlXkQQ7kNvwGfJTg2&amp;_nc_oc=AdqEwYlfATqb1V6Z02a0GD2tMWfITUuTHPzPO5GO7zNfwkadN-LxOKdievbtb-GP6ug&amp;_nc_zt=23&amp;_nc_ht=scontent.fdac138-1.fna&amp;_nc_gid=87QYaxaCo2WbWbdvYV6ntQ&amp;_nc_ss=7b2a8&amp;oh=00_Af9sBXRzs4GQ1aEENkYuUROWlpOzgOCxenGpLQmpjoIu4Q&amp;oe=6A40DDC9" alt="" style="height:34px;">
-        <span>jibon</span>
+        <img id="logoImg" src="" alt="" style="display:none;">
+        <span id="shopNameText"></span>
       </a>
       <nav class="main-nav">
-        <a href="index.html">হোম</a>
-        <a href="shop.html">শপ</a>
+        <a href="index.html" data-i18n="home">হোম</a>
+        <a href="shop.html" data-i18n="shop">শপ</a>
         <a href="cart.html" class="cart-link">
-          <span>কার্ট</span>
+          <span data-i18n="cart">কার্ট</span>
           <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
         </a>
-        <a href="login.html">লগইন</a>
+        <a href="login.html" data-i18n="login">লগইন</a>
       </nav>
       <button id="langToggle" class="lang-toggle">English</button>
     </div>
   </header>
 
   <main class="page-inner">
-    <h1 class="page-title">শপ</h1>
+    <h1 class="page-title" data-i18n="shop">শপ</h1>
+
     <div class="filter-bar">
       <div class="search-box">
-        <input type="text" id="searchInput" placeholder="প্রোডাক্ট খুঁজুন...">
+        <input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="প্রোডাক্ট খুঁজুন...">
       </div>
     </div>
-    <div class="category-pills" id="categoryPills">
-      <button type="button" class="pill active" data-slug="">সব</button>
-      <button type="button" class="pill" data-slug="fashion">fashion</button><button type="button" class="pill" data-slug="instruments">instruments</button><button type="button" class="pill" data-slug="audio">audio</button><button type="button" class="pill" data-slug="home">home</button><button type="button" class="pill" data-slug="gadgets">gadgets</button><button type="button" class="pill" data-slug="electronics">electronics</button>
-    </div>
+    <div class="category-pills" id="categoryPills"></div>
     <div class="results-label" id="resultsLabel"></div>
-    <div class="product-grid" id="productGrid">
-      <div class="product-card-wrap">
-      <a href="product/9OdTb1tPyjfQRJVjMgy2.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">গোপ্রো হিরো ১২</div>
-          
-          <div class="product-price"><span class="price-now">৳52000</span> <span class="price-old">৳55000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="9OdTb1tPyjfQRJVjMgy2">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/D0L6F7gmUmfmEVbpu8ti.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">জারা ব্লেজার</div>
-          
-          <div class="product-price"><span class="price-now">৳13000</span> <span class="price-old">৳15000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="D0L6F7gmUmfmEVbpu8ti">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/Ls8OlT8VQomJk7MPi9Ol.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">নাইকি এয়ার ফোর্স ১</div>
-          
-          <div class="product-price"><span class="price-now">৳10000</span> <span class="price-old">৳12000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="Ls8OlT8VQomJk7MPi9Ol">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/RufH1Ng0KXXb8OGpzhz8.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">টাইমেক্স ওয়িকেন্ডার</div>
-          
-          <div class="product-price"><span class="price-now">৳4000</span> <span class="price-old">৳5000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="RufH1Ng0KXXb8OGpzhz8">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/WRz68qGgi9IAk19ed1L5.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1615412704911-55d589229864?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">ফিলিপস এয়ার ফ্রায়ার</div>
-          
-          <div class="product-price"><span class="price-now">৳23000</span> <span class="price-old">৳25000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="WRz68qGgi9IAk19ed1L5">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/aGRfNyfQsXXoSfKrpQFi.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">ম্যাকবুক এয়ার M3</div>
-          
-          <div class="product-price"><span class="price-now">৳130000</span> <span class="price-old">৳140000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="aGRfNyfQsXXoSfKrpQFi">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/e2NDHVIpQhr5kH4toMgY.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">ক্যাসিও কিবোর্ড</div>
-          
-          <div class="product-price"><span class="price-now">৳14000</span> <span class="price-old">৳15000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="e2NDHVIpQhr5kH4toMgY">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/idau8bh4OOmJT5jdbefo.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">রোলেক্স সাবমেরিনার</div>
-          
-          <div class="product-price"><span class="price-now">৳950000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="idau8bh4OOmJT5jdbefo">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/jcvBtvSztNw9FiUNvbG7.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">সোনি হেডফোন WH-1000XM5</div>
-          
-          <div class="product-price"><span class="price-now">৳32000</span> <span class="price-old">৳35000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="jcvBtvSztNw9FiUNvbG7">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/my1JJZMrswUYMGCKtEps.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1603351154351-5e2d0600bb77?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">এয়ারপডস প্রো ২</div>
-          
-          <div class="product-price"><span class="price-now">৳23000</span> <span class="price-old">৳25000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="my1JJZMrswUYMGCKtEps">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/ngbySAYMPTHidfnHb7tW.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">লেভিস ৫০১ জিন্স</div>
-          
-          <div class="product-price"><span class="price-now">৳7000</span> <span class="price-old">৳8000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="ngbySAYMPTHidfnHb7tW">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/svgZ8KiQYOWDRW1Ld0Ae.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">আইফোন ১৫ প্রো</div>
-          
-          <div class="product-price"><span class="price-now">৳110000</span> <span class="price-old">৳120000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="svgZ8KiQYOWDRW1Ld0Ae">কার্টে যুক্ত করুন</button>
-    </div><div class="product-card-wrap">
-      <a href="product/ywXeKgBza36qQELiFYnF.html" class="product-card">
-        <div class="product-img" style="background-image:url('https://images.unsplash.com/photo-1507582020474-9a35b7d455d9?w=400')"></div>
-        <div class="product-info">
-          <div class="product-name">ড্রোন ডিজে আই মিনি ৪ Pro</div>
-          
-          <div class="product-price"><span class="price-now">৳85000</span> <span class="price-old">৳90000</span></div>
-        </div>
-      </a>
-      <button type="button" class="quick-add" data-id="ywXeKgBza36qQELiFYnF">কার্টে যুক্ত করুন</button>
-    </div>
-    </div>
+
+    <div class="product-grid" id="productGrid"></div>
+    <p class="muted" id="productEmpty" style="display:none;"></p>
   </main>
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <span>jibon © 2026</span>
+      <span><span id="footerShopName"></span> © <span id="footerYear"></span></span>
       <div class="footer-links">
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
@@ -224,132 +112,193 @@
     </div>
   </footer>
 
-  <script>
-    // ---------- সার্চ, ফিল্টার, কার্ট – ক্লায়েন্ট-সাইড ----------
-    const allProducts = [{"id":"9OdTb1tPyjfQRJVjMgy2","name_bn":"গোপ্রো হিরো ১২","name_en":"GoPro Hero 12","tags":["অ্যাকশন ক্যামেরা","গোপ্রো","গ্যাজেট"],"category":"gadgets","hasVariants":false,"images":["https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400","https://images.unsplash.com/photo-1536240474400-9d7a420b0b2b?w=400"],"basePrice":55000,"discountPrice":52000,"avgRating":0},{"id":"D0L6F7gmUmfmEVbpu8ti","name_bn":"জারা ব্লেজার","name_en":"Zara Blazer","tags":["ব্লেজার","জারা","ফর্মাল"],"category":"fashion","hasVariants":false,"images":["https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400","https://images.unsplash.com/photo-1591369822092-ff4c08f7bd73?w=400"],"basePrice":15000,"discountPrice":13000,"avgRating":0},{"id":"Ls8OlT8VQomJk7MPi9Ol","name_bn":"নাইকি এয়ার ফোর্স ১","name_en":"Nike Air Force 1","tags":["জুতা","নাইকি","স্নিকার"],"category":"fashion","hasVariants":false,"images":["https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400","https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=400"],"basePrice":12000,"discountPrice":10000,"avgRating":0},{"id":"RufH1Ng0KXXb8OGpzhz8","name_bn":"টাইমেক্স ওয়িকেন্ডার","name_en":"Timex Weekender","tags":["ঘড়ি","টাইমেক্স","ক্যাসুয়াল"],"category":"fashion","hasVariants":false,"images":["https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400","https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=400"],"basePrice":5000,"discountPrice":4000,"avgRating":0},{"id":"WRz68qGgi9IAk19ed1L5","name_bn":"ফিলিপস এয়ার ফ্রায়ার","name_en":"Philips Air Fryer","tags":["এয়ার ফ্রায়ার","ফিলিপস","হোম"],"category":"home","hasVariants":false,"images":["https://images.unsplash.com/photo-1615412704911-55d589229864?w=400","https://images.unsplash.com/photo-1625904051175-5fc5b0d1b731?w=400"],"basePrice":25000,"discountPrice":23000,"avgRating":0},{"id":"aGRfNyfQsXXoSfKrpQFi","name_bn":"ম্যাকবুক এয়ার M3","name_en":"MacBook Air M3","tags":["ল্যাপটপ","আপেল","এম৩"],"category":"electronics","hasVariants":false,"images":["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400","https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400"],"basePrice":140000,"discountPrice":130000,"avgRating":0},{"id":"e2NDHVIpQhr5kH4toMgY","name_bn":"ক্যাসিও কিবোর্ড","name_en":"Casio CTK-2550 Keyboard","tags":["কিবোর্ড","ক্যাসিও","মিউজিক"],"category":"instruments","hasVariants":false,"images":["https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=400","https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400"],"basePrice":15000,"discountPrice":14000,"avgRating":0},{"id":"idau8bh4OOmJT5jdbefo","name_bn":"রোলেক্স সাবমেরিনার","name_en":"Rolex Submariner","tags":["ঘড়ি","রোলেক্স","লাক্সারি"],"category":"fashion","hasVariants":false,"images":["https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400","https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=400"],"basePrice":950000,"discountPrice":null,"avgRating":0},{"id":"jcvBtvSztNw9FiUNvbG7","name_bn":"সোনি হেডফোন WH-1000XM5","name_en":"Sony WH-1000XM5","tags":["হেডফোন","সোনি","নয়েজ ক্যান্সেলিং"],"category":"audio","hasVariants":false,"images":["https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400","https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400"],"basePrice":35000,"discountPrice":32000,"avgRating":0},{"id":"my1JJZMrswUYMGCKtEps","name_bn":"এয়ারপডস প্রো ২","name_en":"AirPods Pro 2","tags":["ইয়ারবাড","আপেল","ওয়্যারলেস"],"category":"audio","hasVariants":false,"images":["https://images.unsplash.com/photo-1603351154351-5e2d0600bb77?w=400","https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=400"],"basePrice":25000,"discountPrice":23000,"avgRating":0},{"id":"ngbySAYMPTHidfnHb7tW","name_bn":"লেভিস ৫০১ জিন্স","name_en":"Levi's 501 Jeans","tags":["জিন্স","লেভিস","ক্যাসুয়াল"],"category":"fashion","hasVariants":false,"images":["https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400","https://images.unsplash.com/photo-1555689502-c4b22d76c56f?w=400"],"basePrice":8000,"discountPrice":7000,"avgRating":0},{"id":"svgZ8KiQYOWDRW1Ld0Ae","name_bn":"আইফোন ১৫ প্রো","name_en":"iPhone 15 Pro","tags":["স্মার্টফোন","আপেল","প্রিমিয়াম"],"category":"electronics","hasVariants":false,"images":["https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400","https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400"],"basePrice":120000,"discountPrice":110000,"avgRating":0},{"id":"ywXeKgBza36qQELiFYnF","name_bn":"ড্রোন ডিজে আই মিনি ৪ Pro","name_en":"DJI Mini 4 Pro","tags":["ড্রোন","ডিজেআই","গ্যাজেট"],"category":"gadgets","hasVariants":false,"images":["https://images.unsplash.com/photo-1507582020474-9a35b7d455d9?w=400","https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=400"],"basePrice":90000,"discountPrice":85000,"avgRating":0}];
+  <script type="module">
+    import { db } from "./assets/js/firebase-config.js";
+    import { loadThemeAndSettings, trackAddToCart } from "./assets/js/theme-loader.js";
+    import { getLang, setLang, applyTranslations, t } from "./assets/js/translations.js";
+    import { addToCart, updateCartBadge } from "./assets/js/cart.js";
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const fuse = new Fuse(allProducts, {
-      keys: ['name_bn', 'name_en', 'tags'],
-      threshold: 0.4,
-      ignoreLocation: true
+    function escapeAttr(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;");
+    }
+
+    document.getElementById("langToggle").addEventListener("click", () => {
+      setLang(getLang() === "bn" ? "en" : "bn");
+      location.reload();
     });
 
-    let selectedCategory = new URLSearchParams(location.search).get('category') || '';
+    const urlParams = new URLSearchParams(location.search);
+    let selectedCategory = urlParams.get("category") || "";
+    let allProducts = [];
+    let fuse = null;
+    let categoriesMap = {};
+
+    async function loadAllProducts() {
+      const snap = await getDocs(collection(db, "products"));
+      allProducts = [];
+      snap.forEach((docSnap) => {
+        allProducts.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      fuse = new Fuse(allProducts, {
+        keys: ["name_bn", "name_en", "tags"],
+        threshold: 0.4,
+        ignoreLocation: true
+      });
+    }
+
+    async function loadCategoryPills() {
+      const wrap = document.getElementById("categoryPills");
+      try {
+        const snap = await getDocs(collection(db, "categories"));
+        const lang = getLang();
+        let html = `<button type="button" class="pill ${selectedCategory === "" ? "active" : ""}" data-slug="">${lang === "bn" ? "সব" : "All"}</button>`;
+        snap.forEach((docSnap) => {
+          const c = docSnap.data();
+          const name = lang === "bn" ? (c.name_bn || c.name_en) : (c.name_en || c.name_bn);
+          categoriesMap[c.slug] = name;
+          html += `<button type="button" class="pill ${selectedCategory === c.slug ? "active" : ""}" data-slug="${escapeAttr(c.slug)}">${escapeAttr(name)}</button>`;
+        });
+        wrap.innerHTML = html;
+
+        wrap.querySelectorAll(".pill").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            wrap.querySelectorAll(".pill").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedCategory = btn.dataset.slug;
+            applyFilters();
+          });
+        });
+      } catch (e) {
+        console.error("ক্যাটাগরি পিল লোড করতে সমস্যা হয়েছে:", e);
+      }
+    }
+
+    function updateResultsLabel(count) {
+      const label = document.getElementById("resultsLabel");
+      const lang = getLang();
+      const parts = [];
+      if (selectedCategory && categoriesMap[selectedCategory]) parts.push(categoriesMap[selectedCategory]);
+      const searchTerm = document.getElementById("searchInput").value.trim();
+      if (searchTerm) parts.push((lang === "bn" ? "সার্চ: " : "Search: ") + searchTerm);
+      label.textContent = parts.length ? parts.join(" · ") + " (" + count + ")" : "";
+    }
+
+    function applyFilters() {
+      const searchTerm = document.getElementById("searchInput").value.trim();
+      let results = allProducts;
+
+      if (searchTerm) {
+        results = fuse.search(searchTerm).map((r) => r.item);
+      }
+      if (selectedCategory) {
+        results = results.filter((p) => p.category === selectedCategory);
+      }
+
+      updateResultsLabel(results.length);
+      renderProducts(results);
+    }
 
     function renderProducts(results) {
-      const grid = document.getElementById('productGrid');
-      let empty = document.getElementById('productEmpty');
-      if (!empty) {
-        empty = document.createElement('p');
-        empty.id = 'productEmpty';
-        empty.className = 'muted';
-        empty.style.display = 'none';
-        grid.parentNode.appendChild(empty);
-      }
+      const grid = document.getElementById("productGrid");
+      const empty = document.getElementById("productEmpty");
+
       if (results.length === 0) {
-        grid.innerHTML = '';
-        empty.textContent = 'কোনো প্রোডাক্ট পাওয়া যায়নি।';
-        empty.style.display = 'block';
+        grid.innerHTML = "";
+        empty.textContent = getLang() === "bn" ? "কোনো প্রোডাক্ট পাওয়া যায়নি।" : "No products found.";
+        empty.style.display = "block";
         return;
       }
-      empty.style.display = 'none';
-      grid.innerHTML = results.map(p => {
-        const name = p.name_bn || p.name_en || 'Product';
-        const img = (p.images && p.images[0]) || '';
-        const price = p.discountPrice
-          ? '<span class="price-now">৳' + p.discountPrice + '</span> <span class="price-old">৳' + p.basePrice + '</span>'
-          : '<span class="price-now">৳' + p.basePrice + '</span>';
-        const stars = p.avgRating ? '★'.repeat(Math.round(p.avgRating)) : '';
-        const addBtn = !p.hasVariants
-          ? '<button type="button" class="quick-add" data-id="' + p.id + '">কার্টে যুক্ত করুন</button>'
-          : '';
-        return '<div class="product-card-wrap">' +
-          '<a href="product/' + p.id + '.html" class="product-card">' +
-            '<div class="product-img" style="background-image:url(' + img + ')"></div>' +
-            '<div class="product-info">' +
-              '<div class="product-name">' + name + '</div>' +
-              (stars ? '<div class="product-stars">' + stars + '</div>' : '') +
-              '<div class="product-price">' + price + '</div>' +
-            '</div>' +
-          '</a>' +
-          addBtn +
-        '</div>';
-      }).join('');
+      empty.style.display = "none";
 
-      document.querySelectorAll('.quick-add').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+      const lang = getLang();
+      grid.innerHTML = results.map((p) => {
+        const name = lang === "bn" ? (p.name_bn || p.name_en) : (p.name_en || p.name_bn);
+        const img = (p.images && p.images[0]) || "";
+        const price = p.discountPrice
+          ? "<span class='price-now'>৳" + p.discountPrice + "</span> <span class='price-old'>৳" + p.basePrice + "</span>"
+          : "<span class='price-now'>৳" + p.basePrice + "</span>";
+        const stars = p.avgRating ? "★".repeat(Math.round(p.avgRating)) : "";
+        const addBtn = !p.hasVariants
+          ? "<button type='button' class='quick-add' data-id='" + p.id + "'>" + t("add_to_cart") + "</button>"
+          : "";
+
+        return (
+          "<div class='product-card-wrap'>" +
+            "<a href='product/" + p.id + ".html' class='product-card'>" +
+              "<div class='product-img' style=\"background-image:url('" + escapeAttr(img) + "');\"></div>" +
+              "<div class='product-info'>" +
+                "<div class='product-name'>" + escapeAttr(name) + "</div>" +
+                (stars ? "<div class='product-stars'>" + stars + "</div>" : "") +
+                "<div class='product-price'>" + price + "</div>" +
+              "</div>" +
+            "</a>" +
+            addBtn +
+          "</div>"
+        );
+      }).join("");
+
+      grid.querySelectorAll(".quick-add").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
           e.preventDefault();
-          const product = allProducts.find(p => p.id === btn.dataset.id);
+          const product = allProducts.find((p) => p.id === btn.dataset.id);
           if (!product) return;
-          const name = product.name_bn || product.name_en || 'Product';
-          const cart = JSON.parse(localStorage.getItem('localCart') || '[]');
-          const existing = cart.find(i => i.productId === product.id && i.variantCode === product.id);
-          if (existing) existing.qty += 1;
-          else cart.push({ productId: product.id, variantCode: product.id, variantName: '', name, price: product.discountPrice || product.basePrice, image: (product.images && product.images[0]) || '', qty: 1 });
-          localStorage.setItem('localCart', JSON.stringify(cart));
-          const badge = document.getElementById('cartBadge');
-          if (badge) {
-            const count = cart.reduce((s, i) => s + (i.qty || 1), 0);
-            badge.textContent = count;
-            badge.style.display = count > 0 ? 'inline-flex' : 'none';
-          }
-          btn.textContent = 'যুক্ত হয়েছে ✓';
-          setTimeout(() => { btn.textContent = 'কার্টে যুক্ত করুন'; }, 1500);
+          const lang2 = getLang();
+          const name2 = lang2 === "bn" ? (product.name_bn || product.name_en) : (product.name_en || product.name_bn);
+          const item = {
+            productId: product.id,
+            variantCode: product.id,
+            variantName: "",
+            name: name2,
+            price: product.discountPrice || product.basePrice,
+            image: (product.images && product.images[0]) || "",
+            qty: 1
+          };
+          addToCart(item);
+          updateCartBadge();
+          trackAddToCart(item);
+          btn.textContent = lang2 === "bn" ? "যুক্ত হয়েছে ✓" : "Added ✓";
+          setTimeout(() => { btn.textContent = t("add_to_cart"); }, 1500);
         });
       });
     }
 
-    function applyFilters() {
-      const searchTerm = document.getElementById('searchInput').value.trim();
-      let results = allProducts;
-      if (searchTerm) results = fuse.search(searchTerm).map(r => r.item);
-      if (selectedCategory) results = results.filter(p => p.category === selectedCategory);
+    async function init() {
+      applyTranslations();
+      updateCartBadge();
+      document.getElementById("langToggle").textContent = getLang() === "bn" ? "English" : "বাংলা";
 
-      const label = document.getElementById('resultsLabel');
-      const parts = [];
-      const catName = document.querySelector('.pill[data-slug="' + selectedCategory + '"]')?.textContent || '';
-      if (selectedCategory && catName) parts.push(catName);
-      if (searchTerm) parts.push('সার্চ: ' + searchTerm);
-      label.textContent = parts.length ? parts.join(' · ') + ' (' + results.length + ')' : '';
-      renderProducts(results);
-    }
+      const settings = await loadThemeAndSettings();
+      const lang = getLang();
+      const shopName = lang === "bn"
+        ? (settings.shopName_bn || settings.shopName_en)
+        : (settings.shopName_en || settings.shopName_bn);
 
-    document.querySelectorAll('.pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedCategory = btn.dataset.slug;
-        applyFilters();
-      });
-    });
-
-    document.getElementById('searchInput').addEventListener('input', applyFilters);
-
-    if (selectedCategory) {
-      const pill = document.querySelector('.pill[data-slug="' + selectedCategory + '"]');
-      if (pill) {
-        document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
-        pill.classList.add('active');
+      document.getElementById("shopNameText").textContent = shopName || "Shop";
+      document.title = (lang === "bn" ? "শপ — " : "Shop — ") + (shopName || "Shop");
+      document.getElementById("footerShopName").textContent = shopName || "Shop";
+      document.getElementById("footerYear").textContent = new Date().getFullYear();
+      if (settings.logoUrl) {
+        const logoImg = document.getElementById("logoImg");
+        logoImg.src = settings.logoUrl;
+        logoImg.style.display = "inline-block";
       }
-    }
-    applyFilters();
 
-    function updateBadge() {
-      const badge = document.getElementById('cartBadge');
-      if (!badge) return;
-      try {
-        const cart = JSON.parse(localStorage.getItem('localCart') || '[]');
-        const count = cart.reduce((s, i) => s + (i.qty || 1), 0);
-        badge.textContent = count;
-        badge.style.display = count > 0 ? 'inline-flex' : 'none';
-      } catch(e) {}
+      document.getElementById("productEmpty").textContent = lang === "bn" ? "লোড হচ্ছে..." : "Loading...";
+      document.getElementById("productEmpty").style.display = "block";
+
+      await loadAllProducts();
+      await loadCategoryPills();
+      applyFilters();
+
+      document.getElementById("searchInput").addEventListener("input", applyFilters);
     }
-    updateBadge();
-    document.getElementById('langToggle')?.addEventListener('click', () => {
-      const lang = localStorage.getItem('siteLang') === 'bn' ? 'en' : 'bn';
-      localStorage.setItem('siteLang', lang);
-      location.reload();
-    });
+
+    init();
   </script>
+
 </body>
 </html>
