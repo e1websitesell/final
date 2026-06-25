@@ -2,8 +2,12 @@ name: Rebuild static pages
 
 on:
   schedule:
-    - cron: '5-59/5 * * * *'   # প্রতি ৫ মিনিটে, ৫ মিনিট থেকে শুরু
-  workflow_dispatch: {}
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: static-rebuild
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -11,6 +15,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +37,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add -A
+
           if ! git diff --staged --quiet; then
             git commit -m "Auto-rebuild static pages"
             git push
