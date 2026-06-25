@@ -16,4 +16,4 @@
 - electronics: https://e1websitesell.github.io/final/shop.html?category=electronics
 
 ## Products
-14 products available. See sitemap.xml for the full list.
+17 products available. See sitemap.xml for the full list.
